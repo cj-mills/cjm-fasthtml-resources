@@ -38,7 +38,7 @@ from cjm_fasthtml_resources.core.validation import (
 from cjm_fasthtml_resources.core.monitoring_config import RESOURCE_MONITOR_SCHEMA
 from cjm_fasthtml_resources.core.management_config import RESOURCE_MANAGEMENT_SCHEMA
 from cjm_fasthtml_resources.utils.plugin_utils import (
-    is_local_model_plugin,
+    is_local_plugin,
     uses_gpu_device,
     get_plugin_resource_identifier,
     compare_plugin_resources,
@@ -516,7 +516,7 @@ def main():
 
     print("\n🔌 Available Plugins:")
     for plugin in plugin_registry.plugins:
-        is_local = is_local_model_plugin(plugin)
+        is_local = is_local_plugin(plugin)
         plugin_type = "Local" if is_local else "API"
         print(f"  • {plugin.name} ({plugin_type})")
 

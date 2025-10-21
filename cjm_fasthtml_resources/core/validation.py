@@ -86,7 +86,7 @@ def validate_resources_for_job(
     # Check system memory if using CPU
     if requirements['is_local'] and requirements['device'].lower() == 'cpu':
         if verbose:
-            print("→ CPU-based model, checking system memory...")
+            print("→ CPU-based plugin, checking system memory...")
 
         # TODO: Add comprehensive system memory validation
         # For now, just log current memory status
@@ -104,17 +104,17 @@ def validate_resources_for_job(
             if verbose:
                 print("   ⚠ psutil not available, skipping memory check")
 
-        # For now, always proceed for CPU models
+        # For now, always proceed for CPU plugins
         if verbose:
             print("✓ System memory check passed (basic)")
             print("=== Resource Validation Complete ===\n")
         return ValidationResult(
             action=ValidationAction.PROCEED,
             can_proceed=True,
-            message="CPU-based model. System memory check passed."
+            message="CPU-based plugin. System memory check passed."
         )
 
-    # If not a local model or doesn't use GPU, no validation needed
+    # If not a local plugin or doesn't use GPU, no validation needed
     if not requirements['is_local'] or not requirements['uses_gpu']:
         if verbose:
             print("✓ No GPU resources required")

@@ -20,18 +20,18 @@ RESOURCE_MANAGEMENT_SCHEMA = {
             "description": "External processes using more than this percentage of GPU memory are considered conflicts",
             "minimum": 1,
             "maximum": 99,
-            "default": 35.0
+            "default": 45.0
         },
         "enable_auto_unload": {
             "type": "boolean",
-            "title": "Auto-Unload Idle Models",
-            "description": "Automatically unload idle models when switching to a different plugin",
+            "title": "Auto-Unload Idle Plugins",
+            "description": "Automatically unload idle plugins when switching to a different plugin",
             "default": True
         },
         "enable_auto_reload": {
             "type": "boolean",
-            "title": "Auto-Reload Models",
-            "description": "Automatically reload models when configuration changes",
+            "title": "Auto-Reload Plugins",
+            "description": "Automatically reload plugins when configuration changes",
             "default": True
         }
     },

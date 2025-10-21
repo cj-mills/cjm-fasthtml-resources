@@ -373,7 +373,7 @@ SSE_CONFIG = {3 items}
 
 ``` python
 from cjm_fasthtml_resources.utils.plugin_utils import (
-    is_local_model_plugin,
+    is_local_plugin,
     uses_gpu_device,
     get_plugin_resource_identifier,
     compare_plugin_resources,
@@ -384,25 +384,25 @@ from cjm_fasthtml_resources.utils.plugin_utils import (
 #### Functions
 
 ``` python
-def is_local_model_plugin(plugin_meta) -> bool:
+def is_local_plugin(plugin_meta) -> bool:
     """
-    Check if a plugin uses a local model (vs API-based).
+    Check if a plugin is local (vs API-based).
     
     Args:
         plugin_meta: Plugin metadata with config_schema attribute
     
     Returns:
-        True if plugin uses local model, False if API-based
+        True if plugin is local, False if API-based
     """
     if not hasattr(plugin_meta, 'config_schema') or not plugin_meta.config_schema
     """
-    Check if a plugin uses a local model (vs API-based).
+    Check if a plugin is local (vs API-based).
     
     Args:
         plugin_meta: Plugin metadata with config_schema attribute
     
     Returns:
-        True if plugin uses local model, False if API-based
+        True if plugin is local, False if API-based
     """
 ```
 
@@ -494,7 +494,7 @@ def get_plugin_resource_requirements(
     
     Returns:
         Dictionary with resource requirement information:
-        - is_local: Whether it's a local model
+        - is_local: Whether it's a local plugin
         - uses_gpu: Whether it uses GPU
         - plugin_resource: Resource identifier
         - device: Device configuration
