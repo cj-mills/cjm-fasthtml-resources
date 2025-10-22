@@ -112,7 +112,11 @@ class ResourceConflict:
 ``` python
 @dataclass
 class WorkerState:
-    "State of a worker process."
+    """
+    State of a worker process.
+    
+    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.
+    """
     
     pid: int
     worker_type: str  # e.g., "transcription", "llm"
@@ -122,6 +126,12 @@ class WorkerState:
     loaded_plugin_resource: Optional[str]  # The plugin resource identifier currently loaded
     config: Optional[Dict[str, Any]]  # Current plugin configuration
     status: str = 'idle'  # idle, running, busy
+    execution_mode: Optional[str]  # Execution mode (in_process, subprocess, cloud_gpu, etc.)
+    child_pids: List[int] = field(...)  # PIDs of child processes
+    container_id: Optional[str]  # Docker container ID if applicable
+    conda_env: Optional[str]  # Conda environment name if applicable
+    is_remote: bool = False  # Whether this worker uses remote/cloud resources
+    remote_resource: Optional[Dict[str, Any]]  # Remote resource info (serialized RemoteResourceInfo)
 ```
 
 ``` python
@@ -140,6 +150,8 @@ class ResourceManager:
     
     Tracks PIDs associated with application workers (transcription, LLM, etc.)
     and provides methods to check resource availability and conflicts.
+    
+    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.
     """
     
     def __init__(self, gpu_memory_threshold_percent: float = 45.0):
@@ -165,7 +177,8 @@ Args:
             plugin_id: Optional[str] = None,
             plugin_name: Optional[str] = None,
             loaded_plugin_resource: Optional[str] = None,
-            config: Optional[Dict[str, Any]] = None
+            config: Optional[Dict[str, Any]] = None,
+            plugin_instance: Optional[Any] = None  # NEW: Optional plugin instance for lifecycle/cloud detection
         ) -> None
         "Register a worker process with the resource manager.
 
@@ -176,7 +189,27 @@ Args:
     plugin_id: Optional plugin unique ID
     plugin_name: Optional plugin name
     loaded_plugin_resource: Optional identifier of the loaded plugin resource
-    config: Optional plugin configuration"
+    config: Optional plugin configuration
+    plugin_instance: Optional plugin instance for lifecycle/cloud protocol detection"
+    
+    def get_all_related_pids(self, parent_pid: int) -> List[int]:
+            """Get parent PID and all child PIDs managed by this worker.
+            
+            Args:
+                parent_pid: Parent worker PID
+            
+            Returns:
+                List of all PIDs (parent + children)
+            """
+            worker = self._worker_states.get(parent_pid)
+            if not worker
+        "Get parent PID and all child PIDs managed by this worker.
+
+Args:
+    parent_pid: Parent worker PID
+
+Returns:
+    List of all PIDs (parent + children)"
     
     def update_worker_state(
             self,
@@ -233,11 +266,24 @@ Args:
         "Get all registered workers."
     
     def get_app_pids(self) -> Set[int]:
-            """Get all PIDs managed by this application."""
+            """Get all PIDs managed by this application (parents only)."""
             return set(self._worker_states.keys())
+        
+        def get_all_app_pids_including_children(self) -> Set[int]
+        "Get all PIDs managed by this application (parents only)."
     
-        def get_workers_by_type(self, worker_type: str) -> List[WorkerState]
-        "Get all PIDs managed by this application."
+    def get_all_app_pids_including_children(self) -> Set[int]:
+            """Get all PIDs managed by this application including child processes.
+            
+            Returns:
+                Set of all PIDs (parents and children)
+            """
+            all_pids = set(self._worker_states.keys())
+            for worker in self._worker_states.values()
+        "Get all PIDs managed by this application including child processes.
+
+Returns:
+    Set of all PIDs (parents and children)"
     
     def get_workers_by_type(self, worker_type: str) -> List[WorkerState]:
             """
@@ -286,8 +332,8 @@ Returns:
                 True if at least one worker of this type exists
             """
             return any(w.worker_type == worker_type for w in self._worker_states.values())
-    
-        def check_gpu_availability(self) -> ResourceConflict
+        
+        def get_cloud_workers(self) -> List[WorkerState]
         "Check if a worker of the specified type exists.
 
 Args:
@@ -296,12 +342,47 @@ Args:
 Returns:
     True if at least one worker of this type exists"
     
+    def get_cloud_workers(self) -> List[WorkerState]:
+            """Get all workers using cloud/remote resources.
+            
+            Returns:
+                List of workers with is_remote=True
+            """
+            return [w for w in self._worker_states.values() if w.is_remote]
+        
+        def estimate_total_cloud_cost(self, duration_hours: float = 1.0) -> float
+        "Get all workers using cloud/remote resources.
+
+Returns:
+    List of workers with is_remote=True"
+    
+    def estimate_total_cloud_cost(self, duration_hours: float = 1.0) -> float:
+            """Estimate total cost of all running cloud resources.
+            
+            Args:
+                duration_hours: Duration to estimate for (default 1 hour)
+            
+            Returns:
+                Total estimated cost in USD
+            """
+            total = 0.0
+            for worker in self.get_cloud_workers()
+        "Estimate total cost of all running cloud resources.
+
+Args:
+    duration_hours: Duration to estimate for (default 1 hour)
+
+Returns:
+    Total estimated cost in USD"
+    
     def check_gpu_availability(self) -> ResourceConflict:
             """
             Check GPU availability and identify conflicts.
             
             Uses configurable GPU memory threshold to determine if external processes
             are using significant GPU resources.
+            
+            Enhanced to detect child processes from lifecycle-aware plugins.
             
             Returns:
                 ResourceConflict with details about GPU usage
@@ -311,6 +392,8 @@ Returns:
 
 Uses configurable GPU memory threshold to determine if external processes
 are using significant GPU resources.
+
+Enhanced to detect child processes from lifecycle-aware plugins.
 
 Returns:
     ResourceConflict with details about GPU usage"

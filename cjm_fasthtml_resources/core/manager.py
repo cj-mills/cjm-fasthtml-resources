@@ -6,9 +6,14 @@
 __all__ = ['PLUGIN_RESOURCE_CONFIG_KEYS', 'ResourceType', 'ResourceStatus', 'ResourceConflict', 'WorkerState', 'ResourceManager']
 
 # %% ../../nbs/core/manager.ipynb 3
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List, Set, TYPE_CHECKING
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+# Import from cjm-fasthtml-plugins for enhanced plugin support
+if TYPE_CHECKING:
+    from cjm_fasthtml_plugins.core.execution_mode import PluginExecutionMode
+    from cjm_fasthtml_plugins.core.metadata import RemoteResourceInfo
 
 # %% ../../nbs/core/manager.ipynb 5
 class ResourceType(Enum):
@@ -37,7 +42,10 @@ class ResourceConflict:
 # %% ../../nbs/core/manager.ipynb 9
 @dataclass
 class WorkerState:
-    """State of a worker process."""
+    """State of a worker process.
+    
+    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.
+    """
     pid: int
     worker_type: str  # e.g., "transcription", "llm"
     job_id: Optional[str] = None
@@ -46,18 +54,30 @@ class WorkerState:
     loaded_plugin_resource: Optional[str] = None  # The plugin resource identifier currently loaded
     config: Optional[Dict[str, Any]] = None  # Current plugin configuration
     status: str = "idle"  # idle, running, busy
+    
+    # Extended for lifecycle-aware plugins (from cjm-fasthtml-plugins)
+    execution_mode: Optional[str] = None  # Execution mode (in_process, subprocess, cloud_gpu, etc.)
+    child_pids: List[int] = field(default_factory=list)  # PIDs of child processes
+    container_id: Optional[str] = None  # Docker container ID if applicable
+    conda_env: Optional[str] = None  # Conda environment name if applicable
+    
+    # Extended for cloud-aware plugins
+    is_remote: bool = False  # Whether this worker uses remote/cloud resources
+    remote_resource: Optional[Dict[str, Any]] = None  # Remote resource info (serialized RemoteResourceInfo)
 
-# %% ../../nbs/core/manager.ipynb 12
+# %% ../../nbs/core/manager.ipynb 13
 # Common configuration keys that indicate the plugin resource being used
 PLUGIN_RESOURCE_CONFIG_KEYS = ["resource_id", "model_id", "model", "model_name", "model_path"]
 
-# %% ../../nbs/core/manager.ipynb 14
+# %% ../../nbs/core/manager.ipynb 15
 class ResourceManager:
     """
     Manages resource tracking and conflict detection for the application.
     
     Tracks PIDs associated with application workers (transcription, LLM, etc.)
     and provides methods to check resource availability and conflicts.
+    
+    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.
     """
 
     def __init__(self, gpu_memory_threshold_percent: float = 45.0):
@@ -70,6 +90,7 @@ class ResourceManager:
         """
         self._worker_states: Dict[int, WorkerState] = {}  # pid -> WorkerState
         self._job_to_pid: Dict[str, int] = {}  # job_id -> pid
+        self._child_to_parent: Dict[int, int] = {}  # child_pid -> parent_pid
         self.gpu_memory_threshold_percent = gpu_memory_threshold_percent
 
     def register_worker(
@@ -80,7 +101,8 @@ class ResourceManager:
         plugin_id: Optional[str] = None,
         plugin_name: Optional[str] = None,
         loaded_plugin_resource: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None
+        config: Optional[Dict[str, Any]] = None,
+        plugin_instance: Optional[Any] = None  # NEW: Optional plugin instance for lifecycle/cloud detection
     ) -> None:
         """
         Register a worker process with the resource manager.
@@ -93,7 +115,9 @@ class ResourceManager:
             plugin_name: Optional plugin name
             loaded_plugin_resource: Optional identifier of the loaded plugin resource
             config: Optional plugin configuration
+            plugin_instance: Optional plugin instance for lifecycle/cloud protocol detection
         """
+        # Create base worker state
         worker = WorkerState(
             pid=pid,
             worker_type=worker_type,
@@ -104,10 +128,67 @@ class ResourceManager:
             config=config,
             status="idle"
         )
+        
+        # If plugin instance provided, check for lifecycle/cloud awareness
+        if plugin_instance:
+            try:
+                from cjm_fasthtml_plugins.protocols.lifecycle import is_lifecycle_aware
+                from cjm_fasthtml_plugins.protocols.cloud_aware import is_cloud_aware
+                
+                # Check lifecycle awareness
+                if is_lifecycle_aware(plugin_instance):
+                    worker.execution_mode = plugin_instance.get_execution_mode().value
+                    worker.child_pids = plugin_instance.get_child_pids()
+                    
+                    # Track child -> parent mapping
+                    for child_pid in worker.child_pids:
+                        self._child_to_parent[child_pid] = pid
+                    
+                    # Get managed resources info
+                    resources = plugin_instance.get_managed_resources()
+                    if 'container_id' in resources:
+                        worker.container_id = resources['container_id']
+                    if 'conda_env' in resources:
+                        worker.conda_env = resources['conda_env']
+                
+                # Check cloud awareness
+                if is_cloud_aware(plugin_instance):
+                    remote_info = plugin_instance.get_remote_resource_info()
+                    if remote_info:
+                        worker.is_remote = True
+                        # Serialize RemoteResourceInfo to dict for storage
+                        worker.remote_resource = {
+                            'provider': remote_info.provider.value if hasattr(remote_info.provider, 'value') else str(remote_info.provider),
+                            'region': remote_info.region,
+                            'instance_id': remote_info.instance_id,
+                            'status': remote_info.status,
+                            'ssh_host': remote_info.ssh_host,
+                            'gpu_count': remote_info.gpu_count,
+                            'gpu_type': remote_info.gpu_type,
+                            'estimated_cost_per_hour': remote_info.estimated_cost_per_hour
+                        }
+            except ImportError:
+                # cjm-fasthtml-plugins not available, skip protocol checks
+                pass
+        
         self._worker_states[pid] = worker
 
         if job_id:
             self._job_to_pid[job_id] = pid
+    
+    def get_all_related_pids(self, parent_pid: int) -> List[int]:
+        """Get parent PID and all child PIDs managed by this worker.
+        
+        Args:
+            parent_pid: Parent worker PID
+        
+        Returns:
+            List of all PIDs (parent + children)
+        """
+        worker = self._worker_states.get(parent_pid)
+        if not worker:
+            return [parent_pid]
+        return [parent_pid] + worker.child_pids
 
     def update_worker_state(
         self,
@@ -165,6 +246,12 @@ class ResourceManager:
         """
         if pid in self._worker_states:
             worker = self._worker_states[pid]
+            
+            # Clean up child PID mappings
+            for child_pid in worker.child_pids:
+                if child_pid in self._child_to_parent:
+                    del self._child_to_parent[child_pid]
+            
             if worker.job_id and worker.job_id in self._job_to_pid:
                 del self._job_to_pid[worker.job_id]
             del self._worker_states[pid]
@@ -185,8 +272,19 @@ class ResourceManager:
         return list(self._worker_states.values())
 
     def get_app_pids(self) -> Set[int]:
-        """Get all PIDs managed by this application."""
+        """Get all PIDs managed by this application (parents only)."""
         return set(self._worker_states.keys())
+    
+    def get_all_app_pids_including_children(self) -> Set[int]:
+        """Get all PIDs managed by this application including child processes.
+        
+        Returns:
+            Set of all PIDs (parents and children)
+        """
+        all_pids = set(self._worker_states.keys())
+        for worker in self._worker_states.values():
+            all_pids.update(worker.child_pids)
+        return all_pids
 
     def get_workers_by_type(self, worker_type: str) -> List[WorkerState]:
         """
@@ -220,6 +318,29 @@ class ResourceManager:
             True if at least one worker of this type exists
         """
         return any(w.worker_type == worker_type for w in self._worker_states.values())
+    
+    def get_cloud_workers(self) -> List[WorkerState]:
+        """Get all workers using cloud/remote resources.
+        
+        Returns:
+            List of workers with is_remote=True
+        """
+        return [w for w in self._worker_states.values() if w.is_remote]
+    
+    def estimate_total_cloud_cost(self, duration_hours: float = 1.0) -> float:
+        """Estimate total cost of all running cloud resources.
+        
+        Args:
+            duration_hours: Duration to estimate for (default 1 hour)
+        
+        Returns:
+            Total estimated cost in USD
+        """
+        total = 0.0
+        for worker in self.get_cloud_workers():
+            if worker.remote_resource and worker.remote_resource.get('estimated_cost_per_hour'):
+                total += worker.remote_resource['estimated_cost_per_hour'] * duration_hours
+        return total
 
     def check_gpu_availability(self) -> ResourceConflict:
         """
@@ -227,6 +348,8 @@ class ResourceManager:
         
         Uses configurable GPU memory threshold to determine if external processes
         are using significant GPU resources.
+        
+        Enhanced to detect child processes from lifecycle-aware plugins.
         
         Returns:
             ResourceConflict with details about GPU usage
@@ -267,7 +390,8 @@ class ResourceManager:
 
         # Get all processes using GPU
         gpu_processes = gpu_info.get('processes', [])
-        app_pids = self.get_app_pids()
+        # Get all app PIDs including children
+        app_pids = self.get_all_app_pids_including_children()
 
         app_gpu_pids = []
         external_gpu_pids = []
@@ -285,7 +409,14 @@ class ResourceManager:
 
             if pid in app_pids:
                 app_gpu_pids.append(pid)
-                app_gpu_processes.append(proc)
+                # Add parent info if this is a child process
+                parent_pid = self._child_to_parent.get(pid)
+                proc_info = dict(proc)
+                if parent_pid:
+                    parent_worker = self._worker_states.get(parent_pid)
+                    proc_info['parent_pid'] = parent_pid
+                    proc_info['parent_worker_type'] = parent_worker.worker_type if parent_worker else None
+                app_gpu_processes.append(proc_info)
             else:
                 # Only count as external conflict if using significant memory
                 if memory_percent >= self.gpu_memory_threshold_percent:
@@ -339,7 +470,8 @@ class ResourceManager:
         proc_info = get_process_info(top_n=20)
         top_memory = proc_info.get('top_memory', [])
 
-        app_pids = self.get_app_pids()
+        # Get all app PIDs including children
+        app_pids = self.get_all_app_pids_including_children()
 
         app_mem_pids = []
         external_mem_pids = []
