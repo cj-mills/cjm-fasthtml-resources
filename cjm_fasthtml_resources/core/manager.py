@@ -71,23 +71,13 @@ PLUGIN_RESOURCE_CONFIG_KEYS = ["resource_id", "model_id", "model", "model_name",
 
 # %% ../../nbs/core/manager.ipynb 15
 class ResourceManager:
-    """
-    Manages resource tracking and conflict detection for the application.
-    
-    Tracks PIDs associated with application workers (transcription, LLM, etc.)
-    and provides methods to check resource availability and conflicts.
-    
-    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.
-    """
+    """Manages resource tracking and conflict detection for the application. Tracks PIDs associated with application workers (transcription, LLM, etc.) and provides methods to check resource availability and conflicts. Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins."""
 
-    def __init__(self, gpu_memory_threshold_percent: float = 45.0):
-        """
-        Initialize the resource manager.
-        
-        Args:
-            gpu_memory_threshold_percent: GPU memory usage threshold (default 45%)
-                External processes using more than this percentage are considered conflicts
-        """
+    def __init__(
+        self,
+        gpu_memory_threshold_percent:float=45.0 # GPU memory usage threshold; external processes using more than this percentage are considered conflicts
+    ):
+        """Initialize the resource manager."""
         self._worker_states: Dict[int, WorkerState] = {}  # pid -> WorkerState
         self._job_to_pid: Dict[str, int] = {}  # job_id -> pid
         self._child_to_parent: Dict[int, int] = {}  # child_pid -> parent_pid
@@ -95,28 +85,16 @@ class ResourceManager:
 
     def register_worker(
         self,
-        pid: int,
-        worker_type: str,
-        job_id: Optional[str] = None,
-        plugin_id: Optional[str] = None,
-        plugin_name: Optional[str] = None,
-        loaded_plugin_resource: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
-        plugin_instance: Optional[Any] = None  # NEW: Optional plugin instance for lifecycle/cloud detection
-    ) -> None:
-        """
-        Register a worker process with the resource manager.
-        
-        Args:
-            pid: Process ID of the worker
-            worker_type: Type of worker (e.g., "transcription", "llm")
-            job_id: Optional job ID if worker is processing a job
-            plugin_id: Optional plugin unique ID
-            plugin_name: Optional plugin name
-            loaded_plugin_resource: Optional identifier of the loaded plugin resource
-            config: Optional plugin configuration
-            plugin_instance: Optional plugin instance for lifecycle/cloud protocol detection
-        """
+        pid:int, # Process ID of the worker
+        worker_type:str, # Type of worker (e.g., "transcription", "llm")
+        job_id:Optional[str]=None, # Optional job ID if worker is processing a job
+        plugin_id:Optional[str]=None, # Optional plugin unique ID
+        plugin_name:Optional[str]=None, # Optional plugin name
+        loaded_plugin_resource:Optional[str]=None, # Optional identifier of the loaded plugin resource
+        config:Optional[Dict[str, Any]]=None, # Optional plugin configuration
+        plugin_instance:Optional[Any]=None # Optional plugin instance for lifecycle/cloud protocol detection
+    ):
+        """Register a worker process with the resource manager."""
         # Create base worker state
         worker = WorkerState(
             pid=pid,
@@ -176,15 +154,11 @@ class ResourceManager:
         if job_id:
             self._job_to_pid[job_id] = pid
     
-    def get_all_related_pids(self, parent_pid: int) -> List[int]:
-        """Get parent PID and all child PIDs managed by this worker.
-        
-        Args:
-            parent_pid: Parent worker PID
-        
-        Returns:
-            List of all PIDs (parent + children)
-        """
+    def get_all_related_pids(
+        self,
+        parent_pid:int # Parent worker PID
+    ) -> List[int]: # List of all PIDs (parent + children)
+        """Get parent PID and all child PIDs managed by this worker."""
         worker = self._worker_states.get(parent_pid)
         if not worker:
             return [parent_pid]
@@ -192,26 +166,15 @@ class ResourceManager:
 
     def update_worker_state(
         self,
-        pid: int,
-        job_id: Optional[str] = None,
-        plugin_id: Optional[str] = None,
-        plugin_name: Optional[str] = None,
-        loaded_plugin_resource: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
-        status: Optional[str] = None
-    ) -> None:
-        """
-        Update the state of a registered worker.
-        
-        Args:
-            pid: Process ID of the worker
-            job_id: Optional job ID to update
-            plugin_id: Optional plugin ID to update
-            plugin_name: Optional plugin name to update
-            loaded_plugin_resource: Optional loaded plugin resource to update
-            config: Optional config to update
-            status: Optional status to update
-        """
+        pid:int, # Process ID of the worker
+        job_id:Optional[str]=None, # Optional job ID to update
+        plugin_id:Optional[str]=None, # Optional plugin ID to update
+        plugin_name:Optional[str]=None, # Optional plugin name to update
+        loaded_plugin_resource:Optional[str]=None, # Optional loaded plugin resource to update
+        config:Optional[Dict[str, Any]]=None, # Optional config to update
+        status:Optional[str]=None # Optional status to update
+    ):
+        """Update the state of a registered worker."""
         if pid not in self._worker_states:
             return
 
@@ -237,13 +200,11 @@ class ResourceManager:
         if status is not None:
             worker.status = status
 
-    def unregister_worker(self, pid: int) -> None:
-        """
-        Unregister a worker process.
-        
-        Args:
-            pid: Process ID of the worker to unregister
-        """
+    def unregister_worker(
+        self,
+        pid:int # Process ID of the worker to unregister
+    ):
+        """Unregister a worker process."""
         if pid in self._worker_states:
             worker = self._worker_states[pid]
             
@@ -256,104 +217,73 @@ class ResourceManager:
                 del self._job_to_pid[worker.job_id]
             del self._worker_states[pid]
 
-    def get_worker_by_pid(self, pid: int) -> Optional[WorkerState]:
+    def get_worker_by_pid(
+        self,
+        pid:int # Process ID
+    ) -> Optional[WorkerState]: # Worker state or None
         """Get worker state by PID."""
         return self._worker_states.get(pid)
 
-    def get_worker_by_job(self, job_id: str) -> Optional[WorkerState]:
+    def get_worker_by_job(
+        self,
+        job_id:str # Job ID
+    ) -> Optional[WorkerState]: # Worker state or None
         """Get worker state by job ID."""
         pid = self._job_to_pid.get(job_id)
         if pid:
             return self._worker_states.get(pid)
         return None
 
-    def get_all_workers(self) -> List[WorkerState]:
+    def get_all_workers(self) -> List[WorkerState]: # List of all registered workers
         """Get all registered workers."""
         return list(self._worker_states.values())
 
-    def get_app_pids(self) -> Set[int]:
+    def get_app_pids(self) -> Set[int]: # Set of all PIDs managed by this application (parents only)
         """Get all PIDs managed by this application (parents only)."""
         return set(self._worker_states.keys())
     
-    def get_all_app_pids_including_children(self) -> Set[int]:
-        """Get all PIDs managed by this application including child processes.
-        
-        Returns:
-            Set of all PIDs (parents and children)
-        """
+    def get_all_app_pids_including_children(self) -> Set[int]: # Set of all PIDs (parents and children)
+        """Get all PIDs managed by this application including child processes."""
         all_pids = set(self._worker_states.keys())
         for worker in self._worker_states.values():
             all_pids.update(worker.child_pids)
         return all_pids
 
-    def get_workers_by_type(self, worker_type: str) -> List[WorkerState]:
-        """
-        Get all workers of a specific type.
-        
-        Args:
-            worker_type: Type of worker (e.g., "transcription", "llm", "ollama")
-        
-        Returns:
-            List of workers matching the type
-        """
+    def get_workers_by_type(
+        self,
+        worker_type:str # Type of worker (e.g., "transcription", "llm", "ollama")
+    ) -> List[WorkerState]: # List of workers matching the type
+        """Get all workers of a specific type."""
         return [w for w in self._worker_states.values() if w.worker_type == worker_type]
 
-    def get_active_worker_types(self) -> Set[str]:
-        """
-        Get set of all active worker types.
-        
-        Returns:
-            Set of worker type strings
-        """
+    def get_active_worker_types(self) -> Set[str]: # Set of worker type strings
+        """Get set of all active worker types."""
         return {w.worker_type for w in self._worker_states.values()}
 
-    def has_worker_type(self, worker_type: str) -> bool:
-        """
-        Check if a worker of the specified type exists.
-        
-        Args:
-            worker_type: Type of worker to check
-        
-        Returns:
-            True if at least one worker of this type exists
-        """
+    def has_worker_type(
+        self,
+        worker_type:str # Type of worker to check
+    ) -> bool: # True if at least one worker of this type exists
+        """Check if a worker of the specified type exists."""
         return any(w.worker_type == worker_type for w in self._worker_states.values())
     
-    def get_cloud_workers(self) -> List[WorkerState]:
-        """Get all workers using cloud/remote resources.
-        
-        Returns:
-            List of workers with is_remote=True
-        """
+    def get_cloud_workers(self) -> List[WorkerState]: # List of workers with is_remote=True
+        """Get all workers using cloud/remote resources."""
         return [w for w in self._worker_states.values() if w.is_remote]
     
-    def estimate_total_cloud_cost(self, duration_hours: float = 1.0) -> float:
-        """Estimate total cost of all running cloud resources.
-        
-        Args:
-            duration_hours: Duration to estimate for (default 1 hour)
-        
-        Returns:
-            Total estimated cost in USD
-        """
+    def estimate_total_cloud_cost(
+        self,
+        duration_hours:float=1.0 # Duration to estimate for
+    ) -> float: # Total estimated cost in USD
+        """Estimate total cost of all running cloud resources."""
         total = 0.0
         for worker in self.get_cloud_workers():
             if worker.remote_resource and worker.remote_resource.get('estimated_cost_per_hour'):
                 total += worker.remote_resource['estimated_cost_per_hour'] * duration_hours
         return total
 
-    def check_gpu_availability(self) -> ResourceConflict:
-        """
-        Check GPU availability and identify conflicts.
-        
-        Uses configurable GPU memory threshold to determine if external processes
-        are using significant GPU resources.
-        
-        Enhanced to detect child processes from lifecycle-aware plugins.
-        
-        Returns:
-            ResourceConflict with details about GPU usage
-        """
+    def check_gpu_availability(self) -> ResourceConflict: # ResourceConflict with details about GPU usage
+        """Check GPU availability and identify conflicts. Uses configurable GPU memory threshold to determine if external processes are using significant GPU resources. Enhanced to detect child processes from lifecycle-aware plugins."""
         try:
             from cjm_fasthtml_sysmon.monitors.gpu import get_gpu_info
         except ImportError:
@@ -443,16 +373,11 @@ class ResourceManager:
             external_processes=external_gpu_processes
         )
 
-    def check_memory_availability(self, threshold_percent: float = 90.0) -> ResourceConflict:
-        """
-        Check system memory availability.
-        
-        Args:
-            threshold_percent: Memory usage threshold to consider as conflict
-        
-        Returns:
-            ResourceConflict with details about memory usage
-        """
+    def check_memory_availability(
+        self,
+        threshold_percent:float=90.0 # Memory usage threshold to consider as conflict
+    ) -> ResourceConflict: # ResourceConflict with details about memory usage
+        """Check system memory availability."""
         try:
             from cjm_fasthtml_sysmon.monitors.processes import get_process_info
         except ImportError:

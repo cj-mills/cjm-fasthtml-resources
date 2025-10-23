@@ -9,24 +9,15 @@ __all__ = ['wrap_card_in_container', 'create_card_update']
 from typing import Callable, Dict, Any
 
 # %% ../../nbs/utils/route_helpers.ipynb 5
-def wrap_card_in_container(content, html_id, card_cls=None, bg_cls=None, shadow_cls=None, **kwargs):
-    """
-    Wrap card content in a Div container with standard styling.
-    
-    This consolidates the common pattern of wrapping monitoring cards
-    in styled containers.
-    
-    Args:
-        content: Card content to wrap
-        html_id: HTML ID for the container
-        card_cls: Card class (optional, can be provided via DaisyUI)
-        bg_cls: Background class (optional, can be provided via DaisyUI)
-        shadow_cls: Shadow class (optional, can be provided via Tailwind)
-        **kwargs: Additional attributes for the Div
-    
-    Returns:
-        Div: Wrapped card container
-    """
+def wrap_card_in_container(
+    content, # Card content to wrap
+    html_id, # HTML ID for the container
+    card_cls=None, # Card class (optional, can be provided via DaisyUI)
+    bg_cls=None, # Background class (optional, can be provided via DaisyUI)
+    shadow_cls=None, # Shadow class (optional, can be provided via Tailwind)
+    **kwargs # Additional attributes for the Div
+): # Wrapped card container (Div)
+    """Wrap card content in a Div container with standard styling. This consolidates the common pattern of wrapping monitoring cards in styled containers."""
     # This function provides a reusable pattern but remains flexible
     # Applications can provide their own styling classes
     
@@ -57,26 +48,12 @@ def wrap_card_in_container(content, html_id, card_cls=None, bg_cls=None, shadow_
 
 # %% ../../nbs/utils/route_helpers.ipynb 8
 def create_card_update(
-    render_fn: Callable, 
-    info: Dict[str, Any], 
-    target_id: str, 
-    swap_type: str = "outerHTML"
-):
-    """
-    Create an OOB swap update for a card.
-    
-    This consolidates the pattern of creating OOB swaps for card updates
-    in SSE streaming.
-    
-    Args:
-        render_fn: Function to render the card
-        info: Info dictionary to pass to render function
-        target_id: Target HTML ID for the swap
-        swap_type: Type of swap (default "outerHTML")
-    
-    Returns:
-        OOB swap element
-    """
+    render_fn:Callable, # Function to render the card
+    info:Dict[str, Any], # Info dictionary to pass to render function
+    target_id:str, # Target HTML ID for the swap
+    swap_type:str="outerHTML" # Type of swap
+): # OOB swap element
+    """Create an OOB swap update for a card. This consolidates the pattern of creating OOB swaps for card updates in SSE streaming."""
     try:
         from cjm_fasthtml_sse.helpers import oob_swap
         

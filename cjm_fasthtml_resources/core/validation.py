@@ -40,38 +40,18 @@ class ValidationResult:
 
 # %% ../../nbs/core/validation.ipynb 10
 def validate_resources_for_job(
-    resource_manager,  # ResourceManager instance
-    plugin_registry,  # Plugin registry protocol (has get_plugin, load_plugin_config methods)
-    get_plugin_resource_requirements,  # Function: (plugin_id, config) -> Dict with requirements
-    compare_plugin_resources,  # Function: (config1, config2) -> bool (same resource?)
-    get_plugin_resource_identifier,  # Function: (config) -> str (resource ID)
-    plugin_id: str,
-    plugin_config: Optional[Dict[str, Any]] = None,
-    worker_pid: Optional[int] = None,
-    worker_type: str = "transcription",
-    verbose: bool = False
-) -> ValidationResult:
-    """
-    Validate if resources are available to run a job with the specified plugin.
-    
-    This function is dependency-injected with helper functions to avoid tight coupling
-    with specific plugin registry implementations.
-    
-    Args:
-        resource_manager: ResourceManager instance
-        plugin_registry: Plugin registry with get_plugin, load_plugin_config methods
-        get_plugin_resource_requirements: Function to get plugin requirements
-        compare_plugin_resources: Function to compare plugin resources
-        get_plugin_resource_identifier: Function to get resource ID
-        plugin_id: Unique plugin ID
-        plugin_config: Plugin configuration (will load if not provided)
-        worker_pid: PID of the worker that will run the job (if known)
-        worker_type: Type of worker (e.g., "transcription", "llm", "ollama")
-        verbose: Whether to print verbose logging
-    
-    Returns:
-        ValidationResult with action to take
-    """
+    resource_manager, # ResourceManager instance
+    plugin_registry, # Plugin registry protocol (has get_plugin, load_plugin_config methods)
+    get_plugin_resource_requirements, # Function: (plugin_id, config) -> Dict with requirements
+    compare_plugin_resources, # Function: (config1, config2) -> bool (same resource?)
+    get_plugin_resource_identifier, # Function: (config) -> str (resource ID)
+    plugin_id:str, # Unique plugin ID
+    plugin_config:Optional[Dict[str, Any]]=None, # Plugin configuration (will load if not provided)
+    worker_pid:Optional[int]=None, # PID of the worker that will run the job (if known)
+    worker_type:str="transcription", # Type of worker (e.g., "transcription", "llm", "ollama")
+    verbose:bool=False # Whether to print verbose logging
+) -> ValidationResult: # ValidationResult with action to take
+    """Validate if resources are available to run a job with the specified plugin. This function is dependency-injected with helper functions to avoid tight coupling with specific plugin registry implementations."""
     if verbose:
         print(f"\n=== Resource Validation Started ===")
         print(f"Plugin ID: {plugin_id}")

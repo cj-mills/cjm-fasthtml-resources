@@ -12,16 +12,10 @@ from typing import Dict, Any, Optional
 from ..core.manager import PLUGIN_RESOURCE_CONFIG_KEYS
 
 # %% ../../nbs/utils/plugin_utils.ipynb 5
-def is_local_plugin(plugin_meta) -> bool:
-    """
-    Check if a plugin is local (vs API-based).
-    
-    Args:
-        plugin_meta: Plugin metadata with config_schema attribute
-    
-    Returns:
-        True if plugin is local, False if API-based
-    """
+def is_local_plugin(
+    plugin_meta # Plugin metadata with config_schema attribute
+) -> bool: # True if plugin is local, False if API-based
+    """Check if a plugin is local (vs API-based)."""
     if not hasattr(plugin_meta, 'config_schema') or not plugin_meta.config_schema:
         return False
 
@@ -30,16 +24,10 @@ def is_local_plugin(plugin_meta) -> bool:
     return 'api_key' not in properties
 
 # %% ../../nbs/utils/plugin_utils.ipynb 8
-def uses_gpu_device(plugin_config: Dict[str, Any]) -> bool:
-    """
-    Check if a plugin is configured to use GPU.
-    
-    Args:
-        plugin_config: The plugin's current configuration
-    
-    Returns:
-        True if plugin will use GPU, False otherwise
-    """
+def uses_gpu_device(
+    plugin_config:Dict[str, Any] # The plugin's current configuration
+) -> bool: # True if plugin will use GPU, False otherwise
+    """Check if a plugin is configured to use GPU."""
     device = plugin_config.get('device', '').lower()
 
     # Check for explicit GPU indicators
@@ -51,19 +39,10 @@ def uses_gpu_device(plugin_config: Dict[str, Any]) -> bool:
     return False
 
 # %% ../../nbs/utils/plugin_utils.ipynb 11
-def get_plugin_resource_identifier(plugin_config: Dict[str, Any]) -> Optional[str]:
-    """
-    Extract the plugin resource identifier from plugin configuration.
-    
-    Checks common plugin resource configuration keys like 'resource_id', 'model_id', 
-    'model', 'model_name', etc.
-    
-    Args:
-        plugin_config: The plugin's configuration
-    
-    Returns:
-        Plugin resource identifier string, or None if not found
-    """
+def get_plugin_resource_identifier(
+    plugin_config:Dict[str, Any] # The plugin's configuration
+) -> Optional[str]: # Plugin resource identifier string, or None if not found
+    """Extract the plugin resource identifier from plugin configuration. Checks common plugin resource configuration keys like 'resource_id', 'model_id', 'model', 'model_name', etc."""
     for key in PLUGIN_RESOURCE_CONFIG_KEYS:
         if key in plugin_config:
             value = plugin_config[key]
@@ -74,19 +53,10 @@ def get_plugin_resource_identifier(plugin_config: Dict[str, Any]) -> Optional[st
 
 # %% ../../nbs/utils/plugin_utils.ipynb 14
 def compare_plugin_resources(
-    config1: Dict[str, Any],
-    config2: Dict[str, Any]
-) -> bool:
-    """
-    Compare two plugin configurations to see if they use the same plugin resource.
-    
-    Args:
-        config1: First plugin configuration
-        config2: Second plugin configuration
-    
-    Returns:
-        True if both configs specify the same plugin resource, False otherwise
-    """
+    config1:Dict[str, Any], # First plugin configuration
+    config2:Dict[str, Any] # Second plugin configuration
+) -> bool: # True if both configs specify the same plugin resource, False otherwise
+    """Compare two plugin configurations to see if they use the same plugin resource."""
     resource1 = get_plugin_resource_identifier(config1)
     resource2 = get_plugin_resource_identifier(config2)
 
@@ -98,25 +68,11 @@ def compare_plugin_resources(
 
 # %% ../../nbs/utils/plugin_utils.ipynb 17
 def get_plugin_resource_requirements(
-    plugin_id: str,
-    plugin_registry,  # Plugin registry with get_plugin, load_plugin_config methods
-    plugin_config: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
-    """
-    Get resource requirements for a plugin.
-    
-    Args:
-        plugin_id: Unique plugin ID
-        plugin_registry: Plugin registry instance
-        plugin_config: Optional plugin configuration
-    
-    Returns:
-        Dictionary with resource requirement information:
-        - is_local: Whether it's a local plugin
-        - uses_gpu: Whether it uses GPU
-        - plugin_resource: Resource identifier
-        - device: Device configuration
-    """
+    plugin_id:str, # Unique plugin ID
+    plugin_registry, # Plugin registry instance with get_plugin, load_plugin_config methods
+    plugin_config:Optional[Dict[str, Any]]=None # Optional plugin configuration
+) -> Dict[str, Any]: # Dictionary with resource requirement information (is_local, uses_gpu, plugin_resource, device)
+    """Get resource requirements for a plugin."""
     plugin_meta = plugin_registry.get_plugin(plugin_id)
 
     if not plugin_meta:

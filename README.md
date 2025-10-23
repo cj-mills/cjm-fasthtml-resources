@@ -136,286 +136,135 @@ class WorkerState:
 
 ``` python
 class ResourceManager:
-    def __init__(self, gpu_memory_threshold_percent: float = 45.0):
-        """
-        Initialize the resource manager.
-        
-        Args:
-            gpu_memory_threshold_percent: GPU memory usage threshold (default 45%)
-                External processes using more than this percentage are considered conflicts
-        """
-        self._worker_states: Dict[int, WorkerState] = {}  # pid -> WorkerState
-    """
-    Manages resource tracking and conflict detection for the application.
+    def __init__(
+        self,
+        gpu_memory_threshold_percent:float=45.0 # GPU memory usage threshold; external processes using more than this percentage are considered conflicts
+    )
+    "Manages resource tracking and conflict detection for the application. Tracks PIDs associated with application workers (transcription, LLM, etc.) and provides methods to check resource availability and conflicts. Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins."
     
-    Tracks PIDs associated with application workers (transcription, LLM, etc.)
-    and provides methods to check resource availability and conflicts.
-    
-    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.
-    """
-    
-    def __init__(self, gpu_memory_threshold_percent: float = 45.0):
-            """
-            Initialize the resource manager.
-            
-            Args:
-                gpu_memory_threshold_percent: GPU memory usage threshold (default 45%)
-                    External processes using more than this percentage are considered conflicts
-            """
-            self._worker_states: Dict[int, WorkerState] = {}  # pid -> WorkerState
-        "Initialize the resource manager.
-
-Args:
-    gpu_memory_threshold_percent: GPU memory usage threshold (default 45%)
-        External processes using more than this percentage are considered conflicts"
+    def __init__(
+            self,
+            gpu_memory_threshold_percent:float=45.0 # GPU memory usage threshold; external processes using more than this percentage are considered conflicts
+        )
+        "Initialize the resource manager."
     
     def register_worker(
             self,
-            pid: int,
-            worker_type: str,
-            job_id: Optional[str] = None,
-            plugin_id: Optional[str] = None,
-            plugin_name: Optional[str] = None,
-            loaded_plugin_resource: Optional[str] = None,
-            config: Optional[Dict[str, Any]] = None,
-            plugin_instance: Optional[Any] = None  # NEW: Optional plugin instance for lifecycle/cloud detection
-        ) -> None
-        "Register a worker process with the resource manager.
-
-Args:
-    pid: Process ID of the worker
-    worker_type: Type of worker (e.g., "transcription", "llm")
-    job_id: Optional job ID if worker is processing a job
-    plugin_id: Optional plugin unique ID
-    plugin_name: Optional plugin name
-    loaded_plugin_resource: Optional identifier of the loaded plugin resource
-    config: Optional plugin configuration
-    plugin_instance: Optional plugin instance for lifecycle/cloud protocol detection"
+            pid:int, # Process ID of the worker
+            worker_type:str, # Type of worker (e.g., "transcription", "llm")
+            job_id:Optional[str]=None, # Optional job ID if worker is processing a job
+            plugin_id:Optional[str]=None, # Optional plugin unique ID
+            plugin_name:Optional[str]=None, # Optional plugin name
+            loaded_plugin_resource:Optional[str]=None, # Optional identifier of the loaded plugin resource
+            config:Optional[Dict[str, Any]]=None, # Optional plugin configuration
+            plugin_instance:Optional[Any]=None # Optional plugin instance for lifecycle/cloud protocol detection
+        )
+        "Register a worker process with the resource manager."
     
-    def get_all_related_pids(self, parent_pid: int) -> List[int]:
-            """Get parent PID and all child PIDs managed by this worker.
-            
-            Args:
-                parent_pid: Parent worker PID
-            
-            Returns:
-                List of all PIDs (parent + children)
-            """
-            worker = self._worker_states.get(parent_pid)
-            if not worker
-        "Get parent PID and all child PIDs managed by this worker.
-
-Args:
-    parent_pid: Parent worker PID
-
-Returns:
-    List of all PIDs (parent + children)"
+    def get_all_related_pids(
+            self,
+            parent_pid:int # Parent worker PID
+        ) -> List[int]: # List of all PIDs (parent + children)
+        "Get parent PID and all child PIDs managed by this worker."
     
     def update_worker_state(
             self,
-            pid: int,
-            job_id: Optional[str] = None,
-            plugin_id: Optional[str] = None,
-            plugin_name: Optional[str] = None,
-            loaded_plugin_resource: Optional[str] = None,
-            config: Optional[Dict[str, Any]] = None,
-            status: Optional[str] = None
-        ) -> None
-        "Update the state of a registered worker.
-
-Args:
-    pid: Process ID of the worker
-    job_id: Optional job ID to update
-    plugin_id: Optional plugin ID to update
-    plugin_name: Optional plugin name to update
-    loaded_plugin_resource: Optional loaded plugin resource to update
-    config: Optional config to update
-    status: Optional status to update"
+            pid:int, # Process ID of the worker
+            job_id:Optional[str]=None, # Optional job ID to update
+            plugin_id:Optional[str]=None, # Optional plugin ID to update
+            plugin_name:Optional[str]=None, # Optional plugin name to update
+            loaded_plugin_resource:Optional[str]=None, # Optional loaded plugin resource to update
+            config:Optional[Dict[str, Any]]=None, # Optional config to update
+            status:Optional[str]=None # Optional status to update
+        )
+        "Update the state of a registered worker."
     
-    def unregister_worker(self, pid: int) -> None:
-            """
-            Unregister a worker process.
-            
-            Args:
-                pid: Process ID of the worker to unregister
-            """
-            if pid in self._worker_states
-        "Unregister a worker process.
-
-Args:
-    pid: Process ID of the worker to unregister"
+    def unregister_worker(
+            self,
+            pid:int # Process ID of the worker to unregister
+        )
+        "Unregister a worker process."
     
-    def get_worker_by_pid(self, pid: int) -> Optional[WorkerState]:
-            """Get worker state by PID."""
-            return self._worker_states.get(pid)
-    
-        def get_worker_by_job(self, job_id: str) -> Optional[WorkerState]
+    def get_worker_by_pid(
+            self,
+            pid:int # Process ID
+        ) -> Optional[WorkerState]: # Worker state or None
         "Get worker state by PID."
     
-    def get_worker_by_job(self, job_id: str) -> Optional[WorkerState]:
-            """Get worker state by job ID."""
-            pid = self._job_to_pid.get(job_id)
-            if pid
+    def get_worker_by_job(
+            self,
+            job_id:str # Job ID
+        ) -> Optional[WorkerState]: # Worker state or None
         "Get worker state by job ID."
     
-    def get_all_workers(self) -> List[WorkerState]:
+    def get_all_workers(self) -> List[WorkerState]: # List of all registered workers
             """Get all registered workers."""
             return list(self._worker_states.values())
     
-        def get_app_pids(self) -> Set[int]
+        def get_app_pids(self) -> Set[int]: # Set of all PIDs managed by this application (parents only)
         "Get all registered workers."
     
-    def get_app_pids(self) -> Set[int]:
+    def get_app_pids(self) -> Set[int]: # Set of all PIDs managed by this application (parents only)
             """Get all PIDs managed by this application (parents only)."""
             return set(self._worker_states.keys())
         
-        def get_all_app_pids_including_children(self) -> Set[int]
+        def get_all_app_pids_including_children(self) -> Set[int]: # Set of all PIDs (parents and children)
         "Get all PIDs managed by this application (parents only)."
     
-    def get_all_app_pids_including_children(self) -> Set[int]:
-            """Get all PIDs managed by this application including child processes.
-            
-            Returns:
-                Set of all PIDs (parents and children)
-            """
+    def get_all_app_pids_including_children(self) -> Set[int]: # Set of all PIDs (parents and children)
+            """Get all PIDs managed by this application including child processes."""
             all_pids = set(self._worker_states.keys())
             for worker in self._worker_states.values()
-        "Get all PIDs managed by this application including child processes.
-
-Returns:
-    Set of all PIDs (parents and children)"
+        "Get all PIDs managed by this application including child processes."
     
-    def get_workers_by_type(self, worker_type: str) -> List[WorkerState]:
-            """
-            Get all workers of a specific type.
-            
-            Args:
-                worker_type: Type of worker (e.g., "transcription", "llm", "ollama")
-            
-            Returns:
-                List of workers matching the type
-            """
-            return [w for w in self._worker_states.values() if w.worker_type == worker_type]
+    def get_workers_by_type(
+            self,
+            worker_type:str # Type of worker (e.g., "transcription", "llm", "ollama")
+        ) -> List[WorkerState]: # List of workers matching the type
+        "Get all workers of a specific type."
     
-        def get_active_worker_types(self) -> Set[str]
-        "Get all workers of a specific type.
-
-Args:
-    worker_type: Type of worker (e.g., "transcription", "llm", "ollama")
-
-Returns:
-    List of workers matching the type"
-    
-    def get_active_worker_types(self) -> Set[str]:
-            """
-            Get set of all active worker types.
-            
-            Returns:
-                Set of worker type strings
-            """
+    def get_active_worker_types(self) -> Set[str]: # Set of worker type strings
+            """Get set of all active worker types."""
             return {w.worker_type for w in self._worker_states.values()}
     
-        def has_worker_type(self, worker_type: str) -> bool
-        "Get set of all active worker types.
-
-Returns:
-    Set of worker type strings"
+        def has_worker_type(
+            self,
+            worker_type:str # Type of worker to check
+        ) -> bool: # True if at least one worker of this type exists
+        "Get set of all active worker types."
     
-    def has_worker_type(self, worker_type: str) -> bool:
-            """
-            Check if a worker of the specified type exists.
-            
-            Args:
-                worker_type: Type of worker to check
-            
-            Returns:
-                True if at least one worker of this type exists
-            """
-            return any(w.worker_type == worker_type for w in self._worker_states.values())
-        
-        def get_cloud_workers(self) -> List[WorkerState]
-        "Check if a worker of the specified type exists.
-
-Args:
-    worker_type: Type of worker to check
-
-Returns:
-    True if at least one worker of this type exists"
+    def has_worker_type(
+            self,
+            worker_type:str # Type of worker to check
+        ) -> bool: # True if at least one worker of this type exists
+        "Check if a worker of the specified type exists."
     
-    def get_cloud_workers(self) -> List[WorkerState]:
-            """Get all workers using cloud/remote resources.
-            
-            Returns:
-                List of workers with is_remote=True
-            """
+    def get_cloud_workers(self) -> List[WorkerState]: # List of workers with is_remote=True
+            """Get all workers using cloud/remote resources."""
             return [w for w in self._worker_states.values() if w.is_remote]
         
-        def estimate_total_cloud_cost(self, duration_hours: float = 1.0) -> float
-        "Get all workers using cloud/remote resources.
-
-Returns:
-    List of workers with is_remote=True"
+        def estimate_total_cloud_cost(
+            self,
+            duration_hours:float=1.0 # Duration to estimate for
+        ) -> float: # Total estimated cost in USD
+        "Get all workers using cloud/remote resources."
     
-    def estimate_total_cloud_cost(self, duration_hours: float = 1.0) -> float:
-            """Estimate total cost of all running cloud resources.
-            
-            Args:
-                duration_hours: Duration to estimate for (default 1 hour)
-            
-            Returns:
-                Total estimated cost in USD
-            """
-            total = 0.0
-            for worker in self.get_cloud_workers()
-        "Estimate total cost of all running cloud resources.
-
-Args:
-    duration_hours: Duration to estimate for (default 1 hour)
-
-Returns:
-    Total estimated cost in USD"
+    def estimate_total_cloud_cost(
+            self,
+            duration_hours:float=1.0 # Duration to estimate for
+        ) -> float: # Total estimated cost in USD
+        "Estimate total cost of all running cloud resources."
     
-    def check_gpu_availability(self) -> ResourceConflict:
-            """
-            Check GPU availability and identify conflicts.
-            
-            Uses configurable GPU memory threshold to determine if external processes
-            are using significant GPU resources.
-            
-            Enhanced to detect child processes from lifecycle-aware plugins.
-            
-            Returns:
-                ResourceConflict with details about GPU usage
-            """
+    def check_gpu_availability(self) -> ResourceConflict: # ResourceConflict with details about GPU usage
+            """Check GPU availability and identify conflicts. Uses configurable GPU memory threshold to determine if external processes are using significant GPU resources. Enhanced to detect child processes from lifecycle-aware plugins."""
             try
-        "Check GPU availability and identify conflicts.
-
-Uses configurable GPU memory threshold to determine if external processes
-are using significant GPU resources.
-
-Enhanced to detect child processes from lifecycle-aware plugins.
-
-Returns:
-    ResourceConflict with details about GPU usage"
+        "Check GPU availability and identify conflicts. Uses configurable GPU memory threshold to determine if external processes are using significant GPU resources. Enhanced to detect child processes from lifecycle-aware plugins."
     
-    def check_memory_availability(self, threshold_percent: float = 90.0) -> ResourceConflict:
-            """
-            Check system memory availability.
-            
-            Args:
-                threshold_percent: Memory usage threshold to consider as conflict
-            
-            Returns:
-                ResourceConflict with details about memory usage
-            """
-            try
-        "Check system memory availability.
-
-Args:
-    threshold_percent: Memory usage threshold to consider as conflict
-
-Returns:
-    ResourceConflict with details about memory usage"
+    def check_memory_availability(
+            self,
+            threshold_percent:float=90.0 # Memory usage threshold to consider as conflict
+        ) -> ResourceConflict: # ResourceConflict with details about memory usage
+        "Check system memory availability."
 ```
 
 #### Variables
@@ -467,121 +316,37 @@ from cjm_fasthtml_resources.utils.plugin_utils import (
 #### Functions
 
 ``` python
-def is_local_plugin(plugin_meta) -> bool:
-    """
-    Check if a plugin is local (vs API-based).
-    
-    Args:
-        plugin_meta: Plugin metadata with config_schema attribute
-    
-    Returns:
-        True if plugin is local, False if API-based
-    """
-    if not hasattr(plugin_meta, 'config_schema') or not plugin_meta.config_schema
-    """
-    Check if a plugin is local (vs API-based).
-    
-    Args:
-        plugin_meta: Plugin metadata with config_schema attribute
-    
-    Returns:
-        True if plugin is local, False if API-based
-    """
+def is_local_plugin(
+    plugin_meta # Plugin metadata with config_schema attribute
+) -> bool: # True if plugin is local, False if API-based
+    "Check if a plugin is local (vs API-based)."
 ```
 
 ``` python
-def uses_gpu_device(plugin_config: Dict[str, Any]) -> bool:
-    """
-    Check if a plugin is configured to use GPU.
-    
-    Args:
-        plugin_config: The plugin's current configuration
-    
-    Returns:
-        True if plugin will use GPU, False otherwise
-    """
-    device = plugin_config.get('device', '').lower()
-
-    # Check for explicit GPU indicators
-    if device and device != 'cpu'
-    """
-    Check if a plugin is configured to use GPU.
-    
-    Args:
-        plugin_config: The plugin's current configuration
-    
-    Returns:
-        True if plugin will use GPU, False otherwise
-    """
+def uses_gpu_device(
+    "Check if a plugin is configured to use GPU."
 ```
 
 ``` python
-def get_plugin_resource_identifier(plugin_config: Dict[str, Any]) -> Optional[str]:
-    """
-    Extract the plugin resource identifier from plugin configuration.
-    
-    Checks common plugin resource configuration keys like 'resource_id', 'model_id', 
-    'model', 'model_name', etc.
-    
-    Args:
-        plugin_config: The plugin's configuration
-    
-    Returns:
-        Plugin resource identifier string, or None if not found
-    """
-    for key in PLUGIN_RESOURCE_CONFIG_KEYS
-    """
-    Extract the plugin resource identifier from plugin configuration.
-    
-    Checks common plugin resource configuration keys like 'resource_id', 'model_id', 
-    'model', 'model_name', etc.
-    
-    Args:
-        plugin_config: The plugin's configuration
-    
-    Returns:
-        Plugin resource identifier string, or None if not found
-    """
+def get_plugin_resource_identifier(
+    "Extract the plugin resource identifier from plugin configuration. Checks common plugin resource configuration keys like 'resource_id', 'model_id', 'model', 'model_name', etc."
 ```
 
 ``` python
 def compare_plugin_resources(
-    config1: Dict[str, Any],
-    config2: Dict[str, Any]
-) -> bool
-    """
-    Compare two plugin configurations to see if they use the same plugin resource.
-    
-    Args:
-        config1: First plugin configuration
-        config2: Second plugin configuration
-    
-    Returns:
-        True if both configs specify the same plugin resource, False otherwise
-    """
+    config1:Dict[str, Any], # First plugin configuration
+    config2:Dict[str, Any] # Second plugin configuration
+) -> bool: # True if both configs specify the same plugin resource, False otherwise
+    "Compare two plugin configurations to see if they use the same plugin resource."
 ```
 
 ``` python
 def get_plugin_resource_requirements(
-    plugin_id: str,
-    plugin_registry,  # Plugin registry with get_plugin, load_plugin_config methods
-    plugin_config: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]
-    """
-    Get resource requirements for a plugin.
-    
-    Args:
-        plugin_id: Unique plugin ID
-        plugin_registry: Plugin registry instance
-        plugin_config: Optional plugin configuration
-    
-    Returns:
-        Dictionary with resource requirement information:
-        - is_local: Whether it's a local plugin
-        - uses_gpu: Whether it uses GPU
-        - plugin_resource: Resource identifier
-        - device: Device configuration
-    """
+    plugin_id:str, # Unique plugin ID
+    plugin_registry, # Plugin registry instance with get_plugin, load_plugin_config methods
+    plugin_config:Optional[Dict[str, Any]]=None # Optional plugin configuration
+) -> Dict[str, Any]: # Dictionary with resource requirement information (is_local, uses_gpu, plugin_resource, device)
+    "Get resource requirements for a plugin."
 ```
 
 ### Route Helpers (`route_helpers.ipynb`)
@@ -600,48 +365,25 @@ from cjm_fasthtml_resources.utils.route_helpers import (
 #### Functions
 
 ``` python
-def wrap_card_in_container(content, html_id, card_cls=None, bg_cls=None, shadow_cls=None, **kwargs)
-    """
-    Wrap card content in a Div container with standard styling.
-    
-    This consolidates the common pattern of wrapping monitoring cards
-    in styled containers.
-    
-    Args:
-        content: Card content to wrap
-        html_id: HTML ID for the container
-        card_cls: Card class (optional, can be provided via DaisyUI)
-        bg_cls: Background class (optional, can be provided via DaisyUI)
-        shadow_cls: Shadow class (optional, can be provided via Tailwind)
-        **kwargs: Additional attributes for the Div
-    
-    Returns:
-        Div: Wrapped card container
-    """
+def wrap_card_in_container(
+    content, # Card content to wrap
+    html_id, # HTML ID for the container
+    card_cls=None, # Card class (optional, can be provided via DaisyUI)
+    bg_cls=None, # Background class (optional, can be provided via DaisyUI)
+    shadow_cls=None, # Shadow class (optional, can be provided via Tailwind)
+    **kwargs # Additional attributes for the Div
+): # Wrapped card container (Div)
+    "Wrap card content in a Div container with standard styling. This consolidates the common pattern of wrapping monitoring cards in styled containers."
 ```
 
 ``` python
 def create_card_update(
-    render_fn: Callable, 
-    info: Dict[str, Any], 
-    target_id: str, 
-    swap_type: str = "outerHTML"
-)
-    """
-    Create an OOB swap update for a card.
-    
-    This consolidates the pattern of creating OOB swaps for card updates
-    in SSE streaming.
-    
-    Args:
-        render_fn: Function to render the card
-        info: Info dictionary to pass to render function
-        target_id: Target HTML ID for the swap
-        swap_type: Type of swap (default "outerHTML")
-    
-    Returns:
-        OOB swap element
-    """
+    render_fn:Callable, # Function to render the card
+    info:Dict[str, Any], # Info dictionary to pass to render function
+    target_id:str, # Target HTML ID for the swap
+    swap_type:str="outerHTML" # Type of swap
+): # OOB swap element
+    "Create an OOB swap update for a card. This consolidates the pattern of creating OOB swaps for card updates in SSE streaming."
 ```
 
 ### Resource Validation (`validation.ipynb`)
@@ -663,38 +405,18 @@ from cjm_fasthtml_resources.core.validation import (
 
 ``` python
 def validate_resources_for_job(
-    resource_manager,  # ResourceManager instance
-    plugin_registry,  # Plugin registry protocol (has get_plugin, load_plugin_config methods)
-    get_plugin_resource_requirements,  # Function: (plugin_id, config) -> Dict with requirements
-    compare_plugin_resources,  # Function: (config1, config2) -> bool (same resource?)
-    get_plugin_resource_identifier,  # Function: (config) -> str (resource ID)
-    plugin_id: str,
-    plugin_config: Optional[Dict[str, Any]] = None,
-    worker_pid: Optional[int] = None,
-    worker_type: str = "transcription",
-    verbose: bool = False
-) -> ValidationResult
-    """
-    Validate if resources are available to run a job with the specified plugin.
-    
-    This function is dependency-injected with helper functions to avoid tight coupling
-    with specific plugin registry implementations.
-    
-    Args:
-        resource_manager: ResourceManager instance
-        plugin_registry: Plugin registry with get_plugin, load_plugin_config methods
-        get_plugin_resource_requirements: Function to get plugin requirements
-        compare_plugin_resources: Function to compare plugin resources
-        get_plugin_resource_identifier: Function to get resource ID
-        plugin_id: Unique plugin ID
-        plugin_config: Plugin configuration (will load if not provided)
-        worker_pid: PID of the worker that will run the job (if known)
-        worker_type: Type of worker (e.g., "transcription", "llm", "ollama")
-        verbose: Whether to print verbose logging
-    
-    Returns:
-        ValidationResult with action to take
-    """
+    resource_manager, # ResourceManager instance
+    plugin_registry, # Plugin registry protocol (has get_plugin, load_plugin_config methods)
+    get_plugin_resource_requirements, # Function: (plugin_id, config) -> Dict with requirements
+    compare_plugin_resources, # Function: (config1, config2) -> bool (same resource?)
+    get_plugin_resource_identifier, # Function: (config) -> str (resource ID)
+    plugin_id:str, # Unique plugin ID
+    plugin_config:Optional[Dict[str, Any]]=None, # Plugin configuration (will load if not provided)
+    worker_pid:Optional[int]=None, # PID of the worker that will run the job (if known)
+    worker_type:str="transcription", # Type of worker (e.g., "transcription", "llm", "ollama")
+    verbose:bool=False # Whether to print verbose logging
+) -> ValidationResult: # ValidationResult with action to take
+    "Validate if resources are available to run a job with the specified plugin. This function is dependency-injected with helper functions to avoid tight coupling with specific plugin registry implementations."
 ```
 
 #### Classes
