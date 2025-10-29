@@ -136,169 +136,130 @@ print("  ✓ Validation helpers configured")
 # Step 5: Set up FastHTML app
 print("\n[5/5] Setting up FastHTML application...")
 
+# Import styling utilities at module level
+from cjm_fasthtml_tailwind.utilities.spacing import p, m
+from cjm_fasthtml_tailwind.utilities.sizing import container, max_w, w
+from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, text_align
+from cjm_fasthtml_tailwind.core.base import combine_classes
+from cjm_fasthtml_daisyui.components.actions.button import btn, btn_colors, btn_sizes, btn_styles
+from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_colors, badge_styles
+from cjm_fasthtml_daisyui.components.data_input.select import select, select_sizes
 
-def main():
-    """Main entry point - creates the demo app."""
+# Create the FastHTML app at module level
+app, rt = fast_app(
+    pico=False,
+    hdrs=[
+        *get_daisyui_headers(),
+        create_theme_persistence_script(),
+    ],
+    title="FastHTML Resources Demo",
+    htmlkw={'data-theme': 'light'}
+)
 
-    # Create the FastHTML app
-    app, rt = fast_app(
-        pico=False,
-        hdrs=[
-            *get_daisyui_headers(),
-            create_theme_persistence_script(),
-        ],
-        title="FastHTML Resources Demo",
-        htmlkw={'data-theme': 'light'}
-    )
+# Define routes at module level
+@rt
+def index():
+    """Homepage with feature showcase."""
+    return Main(
+        Div(
+            H1("cjm-fasthtml-resources Demo",
+               cls=combine_classes(font_size._4xl, font_weight.bold, m.b(4))),
 
-    from cjm_fasthtml_tailwind.utilities.spacing import p, m
-    from cjm_fasthtml_tailwind.utilities.sizing import container, max_w, w
-    from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, text_align
-    from cjm_fasthtml_tailwind.core.base import combine_classes
-    from cjm_fasthtml_daisyui.components.actions.button import btn, btn_colors, btn_sizes, btn_styles
-    from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_colors, badge_styles
-    from cjm_fasthtml_daisyui.components.data_input.select import select, select_sizes
+            P("Resource management system for tracking workers and detecting conflicts:",
+              cls=combine_classes(font_size.lg, m.b(6))),
 
-    @rt("/")
-    def get():
-        """Homepage with feature showcase."""
-        return Main(
+            # Feature list
             Div(
-                H1("cjm-fasthtml-resources Demo",
-                   cls=combine_classes(font_size._4xl, font_weight.bold, m.b(4))),
-
-                P("Resource management system for tracking workers and detecting conflicts:",
-                  cls=combine_classes(font_size.lg, m.b(6))),
-
-                # Feature list
                 Div(
-                    Div(
-                        Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
-                        Span("ResourceManager for tracking worker processes"),
-                        cls=combine_classes(m.b(3))
-                    ),
-                    Div(
-                        Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
-                        Span("GPU and CPU resource conflict detection"),
-                        cls=combine_classes(m.b(3))
-                    ),
-                    Div(
-                        Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
-                        Span("Resource validation for job execution"),
-                        cls=combine_classes(m.b(3))
-                    ),
-                    Div(
-                        Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
-                        Span("Plugin switching and resource management"),
-                        cls=combine_classes(m.b(3))
-                    ),
-                    Div(
-                        Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
-                        Span("Configuration schemas for monitoring and management"),
-                        cls=combine_classes(m.b(8))
-                    ),
-                    cls=combine_classes(text_align.left, m.b(8))
+                    Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
+                    Span("ResourceManager for tracking worker processes"),
+                    cls=combine_classes(m.b(3))
                 ),
-
-                # Statistics
                 Div(
-                    Span(
-                        Span(f"{len(plugin_registry.plugins)}", cls=str(font_weight.bold)),
-                        " Plugins Available",
-                        cls=combine_classes(badge, badge_colors.info, m.r(2))
-                    ),
-                    Span(
-                        Span(f"{len(resource_manager.get_all_workers())}", cls=str(font_weight.bold)),
-                        " Active Workers",
-                        cls=combine_classes(badge, badge_colors.success, m.r(2))
-                    ),
-                    Span(
-                        Span(f"{len(resource_manager.get_active_worker_types())}", cls=str(font_weight.bold)),
-                        " Worker Types",
-                        cls=combine_classes(badge, badge_colors.warning)
-                    ),
+                    Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
+                    Span("GPU and CPU resource conflict detection"),
+                    cls=combine_classes(m.b(3))
+                ),
+                Div(
+                    Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
+                    Span("Resource validation for job execution"),
+                    cls=combine_classes(m.b(3))
+                ),
+                Div(
+                    Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
+                    Span("Plugin switching and resource management"),
+                    cls=combine_classes(m.b(3))
+                ),
+                Div(
+                    Span("✓", cls=combine_classes(font_size._2xl, m.r(3))),
+                    Span("Configuration schemas for monitoring and management"),
                     cls=combine_classes(m.b(8))
                 ),
+                cls=combine_classes(text_align.left, m.b(8))
+            ),
 
-                A(
-                    "Try the Resource Manager",
-                    href="/manager",
-                    cls=combine_classes(btn, btn_colors.primary, btn_sizes.lg)
+            # Statistics
+            Div(
+                Span(
+                    Span(f"{len(plugin_registry.plugins)}", cls=str(font_weight.bold)),
+                    " Plugins Available",
+                    cls=combine_classes(badge, badge_colors.info, m.r(2))
                 ),
+                Span(
+                    Span(f"{len(resource_manager.get_all_workers())}", cls=str(font_weight.bold)),
+                    " Active Workers",
+                    cls=combine_classes(badge, badge_colors.success, m.r(2))
+                ),
+                Span(
+                    Span(f"{len(resource_manager.get_active_worker_types())}", cls=str(font_weight.bold)),
+                    " Worker Types",
+                    cls=combine_classes(badge, badge_colors.warning)
+                ),
+                cls=combine_classes(m.b(8))
+            ),
 
-                cls=combine_classes(
-                    container,
-                    max_w._4xl,
-                    m.x.auto,
-                    p(8),
-                    text_align.center
-                )
+            A(
+                "Try the Resource Manager",
+                href=manager.to(),
+                cls=combine_classes(btn, btn_colors.primary, btn_sizes.lg)
+            ),
+
+            cls=combine_classes(
+                container,
+                max_w._4xl,
+                m.x.auto,
+                p(8),
+                text_align.center
             )
         )
+    )
 
-    @rt("/manager")
-    def get():
-        """Interactive resource manager page."""
-        return Main(
+@rt
+def manager():
+    """Interactive resource manager page."""
+    return Main(
+        Div(
+            H1("Resource Manager Demo",
+               cls=combine_classes(font_size._3xl, font_weight.bold, m.b(6))),
+
+            # Worker registration form
             Div(
-                H1("Resource Manager Demo",
-                   cls=combine_classes(font_size._3xl, font_weight.bold, m.b(6))),
-
-                # Worker registration form
-                Div(
-                    H2("Register Worker", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
-                    Form(
+                H2("Register Worker", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
+                Form(
+                    Div(
                         Div(
-                            Div(
-                                Label("Worker Type:", cls=combine_classes(font_weight.bold, m.b(2))),
-                                Select(
-                                    Option("Transcription", value="transcription"),
-                                    Option("LLM", value="llm"),
-                                    Option("Image Generation", value="image_gen"),
-                                    name="worker_type",
-                                    cls=combine_classes(select, select_sizes.md, w.full, m.b(4))
-                                ),
-                                cls=combine_classes(m.b(4))
+                            Label("Worker Type:", cls=combine_classes(font_weight.bold, m.b(2))),
+                            Select(
+                                Option("Transcription", value="transcription"),
+                                Option("LLM", value="llm"),
+                                Option("Image Generation", value="image_gen"),
+                                name="worker_type",
+                                cls=combine_classes(select, select_sizes.md, w.full, m.b(4))
                             ),
-                            Div(
-                                Label("Plugin:", cls=combine_classes(font_weight.bold, m.b(2))),
-                                Select(
-                                    Option("Whisper (Local GPU)", value="mock-whisper-local"),
-                                    Option("Whisper (API)", value="mock-whisper-api"),
-                                    Option("LLaMA (Local GPU)", value="mock-llama-local"),
-                                    name="plugin_id",
-                                    cls=combine_classes(select, select_sizes.md, w.full, m.b(4))
-                                ),
-                                cls=combine_classes(m.b(4))
-                            ),
+                            cls=combine_classes(m.b(4))
                         ),
-                        Button(
-                            "Register Worker",
-                            type="submit",
-                            cls=combine_classes(btn, btn_colors.primary, btn_sizes.md)
-                        ),
-                        hx_post="/workers/register",
-                        hx_target="#workers-list",
-                        hx_swap="outerHTML"
-                    ),
-                    cls=combine_classes(m.b(8), p(6), "bg-base-200", "rounded-lg")
-                ),
-
-                # Workers list
-                Div(
-                    id="workers-list",
-                    hx_get="/workers/list",
-                    hx_trigger="load",
-                    hx_swap="outerHTML",
-                    cls=combine_classes(m.b(4))
-                ),
-
-                # Validation tester
-                Div(
-                    H2("Test Resource Validation", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
-                    Form(
                         Div(
-                            Label("Plugin to validate:", cls=combine_classes(font_weight.bold, m.b(2))),
+                            Label("Plugin:", cls=combine_classes(font_weight.bold, m.b(2))),
                             Select(
                                 Option("Whisper (Local GPU)", value="mock-whisper-local"),
                                 Option("Whisper (API)", value="mock-whisper-api"),
@@ -306,236 +267,268 @@ def main():
                                 name="plugin_id",
                                 cls=combine_classes(select, select_sizes.md, w.full, m.b(4))
                             ),
+                            cls=combine_classes(m.b(4))
                         ),
-                        Button(
-                            "Validate Resources",
-                            type="submit",
-                            cls=combine_classes(btn, btn_colors.secondary, btn_sizes.md)
-                        ),
-                        hx_post="/validate",
-                        hx_target="#validation-result",
-                        hx_swap="outerHTML"
                     ),
-                    Div(id="validation-result", cls=combine_classes(m.t(4))),
-                    cls=combine_classes(m.b(8), p(6), "bg-base-200", "rounded-lg")
+                    Button(
+                        "Register Worker",
+                        type="submit",
+                        cls=combine_classes(btn, btn_colors.primary, btn_sizes.md)
+                    ),
+                    hx_post=workers_register.to(),
+                    hx_target="#workers-list",
+                    hx_swap="outerHTML"
                 ),
+                cls=combine_classes(m.b(8), p(6), "bg-base-200", "rounded-lg")
+            ),
 
-                # Back to home
-                A(
-                    "← Back to Home",
-                    href="/",
-                    cls=combine_classes(btn, btn_styles.ghost, m.t(4))
+            # Workers list
+            Div(
+                id="workers-list",
+                hx_get=workers_list.to(),
+                hx_trigger="load",
+                hx_swap="outerHTML",
+                cls=combine_classes(m.b(4))
+            ),
+
+            # Validation tester
+            Div(
+                H2("Test Resource Validation", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
+                Form(
+                    Div(
+                        Label("Plugin to validate:", cls=combine_classes(font_weight.bold, m.b(2))),
+                        Select(
+                            Option("Whisper (Local GPU)", value="mock-whisper-local"),
+                            Option("Whisper (API)", value="mock-whisper-api"),
+                            Option("LLaMA (Local GPU)", value="mock-llama-local"),
+                            name="plugin_id",
+                            cls=combine_classes(select, select_sizes.md, w.full, m.b(4))
+                        ),
+                    ),
+                    Button(
+                        "Validate Resources",
+                        type="submit",
+                        cls=combine_classes(btn, btn_colors.secondary, btn_sizes.md)
+                    ),
+                    hx_post=validate.to(),
+                    hx_target="#validation-result",
+                    hx_swap="outerHTML"
                 ),
+                Div(id="validation-result", cls=combine_classes(m.t(4))),
+                cls=combine_classes(m.b(8), p(6), "bg-base-200", "rounded-lg")
+            ),
 
-                cls=combine_classes(
-                    container,
-                    max_w._4xl,
-                    m.x.auto,
-                    p(8)
-                )
+            # Back to home
+            A(
+                "← Back to Home",
+                href=index.to(),
+                cls=combine_classes(btn, btn_styles.ghost, m.t(4))
+            ),
+
+            cls=combine_classes(
+                container,
+                max_w._4xl,
+                m.x.auto,
+                p(8)
             )
         )
+    )
 
-    @rt("/workers/register")
-    def post(worker_type: str, plugin_id: str):
-        """Register a new worker."""
-        import random
+@rt
+def workers_register(worker_type: str, plugin_id: str):
+    """Register a new worker."""
+    import random
 
-        # Generate fake PID
-        pid = random.randint(10000, 99999)
+    # Generate fake PID
+    pid = random.randint(10000, 99999)
 
-        # Get plugin info
-        plugin = plugin_registry.get_plugin(plugin_id)
-        config = plugin_registry.load_plugin_config(plugin_id)
+    # Get plugin info
+    plugin = plugin_registry.get_plugin(plugin_id)
+    config = plugin_registry.load_plugin_config(plugin_id)
 
-        # Extract resource identifier
-        resource_id = get_plugin_resource_identifier(config)
+    # Extract resource identifier
+    resource_id = get_plugin_resource_identifier(config)
 
-        # Register worker
-        resource_manager.register_worker(
-            pid=pid,
-            worker_type=worker_type,
-            plugin_id=plugin_id,
-            plugin_name=plugin.name if plugin else "unknown",
-            loaded_plugin_resource=resource_id,
-            config=config
-        )
+    # Register worker
+    resource_manager.register_worker(
+        pid=pid,
+        worker_type=worker_type,
+        plugin_id=plugin_id,
+        plugin_name=plugin.name if plugin else "unknown",
+        loaded_plugin_resource=resource_id,
+        config=config
+    )
 
-        print(f"[Demo] Registered {worker_type} worker PID {pid} with plugin {plugin.name if plugin else 'unknown'}")
+    print(f"[Demo] Registered {worker_type} worker PID {pid} with plugin {plugin.name if plugin else 'unknown'}")
 
-        return workers_list()
+    return workers_list()
 
-    @rt("/workers/list")
-    def workers_list():
-        """List all registered workers."""
-        from cjm_fasthtml_daisyui.components.data_display.table import table, table_modifiers
+@rt
+def workers_list():
+    """List all registered workers."""
+    from cjm_fasthtml_daisyui.components.data_display.table import table, table_modifiers
 
-        workers = resource_manager.get_all_workers()
+    workers = resource_manager.get_all_workers()
 
-        if not workers:
-            return Div(
-                H2("Active Workers", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
-                P("No workers registered yet. Register one above!",
-                  cls=combine_classes("text-gray-500", "italic")),
-                id="workers-list"
-            )
-
-        # Create table rows
-        rows = []
-        for worker in workers:
-            type_badge = badge_colors.info
-            if worker.worker_type == "transcription":
-                type_badge = badge_colors.primary
-            elif worker.worker_type == "llm":
-                type_badge = badge_colors.secondary
-
-            status_badge = badge_colors.success if worker.status == "idle" else badge_colors.warning
-
-            # Check if uses GPU
-            uses_gpu = uses_gpu_device(worker.config) if worker.config else False
-            device_text = worker.config.get('device', 'N/A') if worker.config else 'N/A'
-
-            rows.append(
-                Tr(
-                    Td(str(worker.pid)),
-                    Td(Span(worker.worker_type, cls=combine_classes(badge, type_badge))),
-                    Td(worker.plugin_name or "N/A"),
-                    Td(worker.loaded_plugin_resource or "N/A"),
-                    Td(device_text),
-                    Td(Span(worker.status, cls=combine_classes(badge, status_badge))),
-                    Td(
-                        Button(
-                            "Remove",
-                            hx_post=f"/workers/{worker.pid}/remove",
-                            hx_target="#workers-list",
-                            hx_swap="outerHTML",
-                            cls=combine_classes(btn, btn_colors.error, btn_sizes.xs)
-                        )
-                    )
-                )
-            )
-
+    if not workers:
         return Div(
             H2("Active Workers", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
-            Div(
-                Table(
-                    Thead(
-                        Tr(
-                            Th("PID"),
-                            Th("Type"),
-                            Th("Plugin"),
-                            Th("Resource"),
-                            Th("Device"),
-                            Th("Status"),
-                            Th("Actions")
-                        )
-                    ),
-                    Tbody(*rows),
-                    cls=combine_classes(table, table_modifiers.zebra, w.full)
-                ),
-                cls="overflow-x-auto"
-            ),
+            P("No workers registered yet. Register one above!",
+              cls=combine_classes("text-gray-500", "italic")),
             id="workers-list"
         )
 
-    @rt("/workers/{pid}/remove")
-    def post(pid: int):
-        """Remove a worker."""
-        resource_manager.unregister_worker(pid)
-        print(f"[Demo] Removed worker PID {pid}")
-        return workers_list()
+    # Create table rows
+    rows = []
+    for worker in workers:
+        type_badge = badge_colors.info
+        if worker.worker_type == "transcription":
+            type_badge = badge_colors.primary
+        elif worker.worker_type == "llm":
+            type_badge = badge_colors.secondary
 
-    @rt("/validate")
-    def post(plugin_id: str):
-        """Validate resources for a plugin."""
-        # Get plugin info
-        plugin = plugin_registry.get_plugin(plugin_id)
+        status_badge = badge_colors.success if worker.status == "idle" else badge_colors.warning
 
-        if not plugin:
-            return Div(
-                Div(
-                    "❌ Plugin not found",
-                    cls=combine_classes("alert", "alert-error")
-                ),
-                id="validation-result"
+        # Check if uses GPU
+        uses_gpu = uses_gpu_device(worker.config) if worker.config else False
+        device_text = worker.config.get('device', 'N/A') if worker.config else 'N/A'
+
+        rows.append(
+            Tr(
+                Td(str(worker.pid)),
+                Td(Span(worker.worker_type, cls=combine_classes(badge, type_badge))),
+                Td(worker.plugin_name or "N/A"),
+                Td(worker.loaded_plugin_resource or "N/A"),
+                Td(device_text),
+                Td(Span(worker.status, cls=combine_classes(badge, status_badge))),
+                Td(
+                    Button(
+                        "Remove",
+                        hx_post=workers_remove.to(pid=worker.pid),
+                        hx_target="#workers-list",
+                        hx_swap="outerHTML",
+                        cls=combine_classes(btn, btn_colors.error, btn_sizes.xs)
+                    )
+                )
             )
-
-        # Run validation
-        result = validate_resources_for_job(
-            resource_manager=resource_manager,
-            plugin_registry=plugin_registry,
-            get_plugin_resource_requirements=get_requirements_helper,
-            compare_plugin_resources=compare_plugin_resources,
-            get_plugin_resource_identifier=get_plugin_resource_identifier,
-            plugin_id=plugin_id,
-            verbose=True
         )
 
-        # Determine alert style
-        alert_cls = "alert-success" if result.can_proceed else "alert-error"
-        if result.action == ValidationAction.RELOAD_PLUGIN:
-            alert_cls = "alert-warning"
+    return Div(
+        H2("Active Workers", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
+        Div(
+            Table(
+                Thead(
+                    Tr(
+                        Th("PID"),
+                        Th("Type"),
+                        Th("Plugin"),
+                        Th("Resource"),
+                        Th("Device"),
+                        Th("Status"),
+                        Th("Actions")
+                    )
+                ),
+                Tbody(*rows),
+                cls=combine_classes(table, table_modifiers.zebra, w.full)
+            ),
+            cls="overflow-x-auto"
+        ),
+        id="workers-list"
+    )
 
-        # Build message
-        details = []
-        details.append(Div(Strong("Action: "), result.action.value))
-        details.append(Div(Strong("Can proceed: "), str(result.can_proceed)))
-        details.append(Div(Strong("Message: "), result.message))
+@rt
+def workers_remove(pid: int):
+    """Remove a worker."""
+    resource_manager.unregister_worker(pid)
+    print(f"[Demo] Removed worker PID {pid}")
+    return workers_list()
 
-        if result.current_worker:
-            details.append(Div(Strong("Current worker: "), f"PID {result.current_worker.pid}"))
+@rt
+def validate(plugin_id: str):
+    """Validate resources for a plugin."""
+    # Get plugin info
+    plugin = plugin_registry.get_plugin(plugin_id)
 
-        if result.conflict:
-            details.append(Div(Strong("Resource status: "), result.conflict.status.value))
-            if result.conflict.app_pids:
-                details.append(Div(Strong("App PIDs: "), ", ".join(map(str, result.conflict.app_pids))))
-            if result.conflict.external_pids:
-                details.append(Div(Strong("External PIDs: "), ", ".join(map(str, result.conflict.external_pids))))
-
+    if not plugin:
         return Div(
             Div(
-                H3(f"Validation Result: {result.action.value.upper()}",
-                   cls=combine_classes(font_weight.bold, m.b(2))),
-                *details,
-                cls=combine_classes("alert", alert_cls)
+                "❌ Plugin not found",
+                cls=combine_classes("alert", "alert-error")
             ),
             id="validation-result"
         )
 
-    print("  ✓ FastHTML application configured")
-    print("  ✓ Routes registered")
+    # Run validation
+    result = validate_resources_for_job(
+        resource_manager=resource_manager,
+        plugin_registry=plugin_registry,
+        get_plugin_resource_requirements=get_requirements_helper,
+        compare_plugin_resources=compare_plugin_resources,
+        get_plugin_resource_identifier=get_plugin_resource_identifier,
+        plugin_id=plugin_id,
+        verbose=True
+    )
 
-    print("\n" + "="*70)
-    print("Demo App Ready!")
-    print("="*70)
-    print("\n📦 Library Components:")
-    print("  • ResourceManager - Track workers and detect conflicts")
-    print("  • Resource validation - Validate before job execution")
-    print("  • Plugin utilities - Analyze plugin resource requirements")
-    print("  • Configuration schemas - Monitoring and management config")
+    # Determine alert style
+    alert_cls = "alert-success" if result.can_proceed else "alert-error"
+    if result.action == ValidationAction.RELOAD_PLUGIN:
+        alert_cls = "alert-warning"
 
-    print("\n🔌 Available Plugins:")
-    for plugin in plugin_registry.plugins:
-        is_local = is_local_plugin(plugin)
-        plugin_type = "Local" if is_local else "API"
-        print(f"  • {plugin.name} ({plugin_type})")
+    # Build message
+    details = []
+    details.append(Div(Strong("Action: "), result.action.value))
+    details.append(Div(Strong("Can proceed: "), str(result.can_proceed)))
+    details.append(Div(Strong("Message: "), result.message))
 
-    print("\n📊 Configuration Schemas:")
-    print(f"  • Resource Monitoring: {RESOURCE_MONITOR_SCHEMA['name']}")
-    print(f"  • Resource Management: {RESOURCE_MANAGEMENT_SCHEMA['name']}")
+    if result.current_worker:
+        details.append(Div(Strong("Current worker: "), f"PID {result.current_worker.pid}"))
 
-    print("="*70 + "\n")
+    if result.conflict:
+        details.append(Div(Strong("Resource status: "), result.conflict.status.value))
+        if result.conflict.app_pids:
+            details.append(Div(Strong("App PIDs: "), ", ".join(map(str, result.conflict.app_pids))))
+        if result.conflict.external_pids:
+            details.append(Div(Strong("External PIDs: "), ", ".join(map(str, result.conflict.external_pids))))
 
-    return app
+    return Div(
+        Div(
+            H3(f"Validation Result: {result.action.value.upper()}",
+               cls=combine_classes(font_weight.bold, m.b(2))),
+            *details,
+            cls=combine_classes("alert", alert_cls)
+        ),
+        id="validation-result"
+    )
+
+print("  ✓ FastHTML application configured")
+print("  ✓ Routes registered")
+
+print("\n" + "="*70)
+print("Demo App Ready!")
+print("="*70)
+print("\n📦 Library Components:")
+print("  • ResourceManager - Track workers and detect conflicts")
+print("  • Resource validation - Validate before job execution")
+print("  • Plugin utilities - Analyze plugin resource requirements")
+print("  • Configuration schemas - Monitoring and management config")
+
+print("\n🔌 Available Plugins:")
+for plugin in plugin_registry.plugins:
+    is_local = is_local_plugin(plugin)
+    plugin_type = "Local" if is_local else "API"
+    print(f"  • {plugin.name} ({plugin_type})")
+
+print("\n📊 Configuration Schemas:")
+print(f"  • Resource Monitoring: {RESOURCE_MONITOR_SCHEMA['name']}")
+print(f"  • Resource Management: {RESOURCE_MANAGEMENT_SCHEMA['name']}")
+
+print("="*70 + "\n")
 
 
 if __name__ == "__main__":
     import uvicorn
     import webbrowser
     import threading
-
-    # Create the app
-    app = main()
 
     def open_browser(url):
         print(f"🌐 Opening browser at {url}")
