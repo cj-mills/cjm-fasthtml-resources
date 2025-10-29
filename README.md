@@ -420,37 +420,16 @@ def validate_resources_for_job(
     "Validate if resources are available to run a job with the specified plugin. This function is dependency-injected with helper functions to avoid tight coupling with specific plugin registry implementations."
 ```
 
-```` python
+``` python
 def validation_result_to_error(
     result: ValidationResult,  # Validation result to convert
     plugin_id: Optional[str] = None,  # Plugin ID for error context
     job_id: Optional[str] = None,  # Job ID for error context
     worker_pid: Optional[int] = None,  # Worker PID for error context
     **extra_context  # Additional context fields
-)
-    """
-    Convert a ValidationResult into a structured error.
-    
-    This helper allows you to convert validation results into exceptions
-    when you prefer raising errors over returning result objects.
-    
-    Requires: cjm-error-handling library
-    
-    Example:
-        ```python
-        result = validate_resources_for_job(...)
-        if not result.can_proceed:
-            error = validation_result_to_error(result, plugin_id="whisper_large")
-            raise error
-        ```
-    
-    Returns appropriate error type based on ValidationAction:
-    - ABORT, USER_INTERVENTION -> ValidationError (not retryable)
-    - WAIT_FOR_JOB, WAIT_FOR_OTHER_WORKER -> ResourceError (retryable)
-    - RELOAD_PLUGIN -> Returns None (this is a success case)
-    - PROCEED -> Returns None (this is a success case)
-    """
-````
+) -> Optional[Exception]:  # Structured error based on validation action, or None if no error needed
+    "Convert a ValidationResult into a structured error. Requires cjm-error-handling library."
+```
 
 #### Classes
 
