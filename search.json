@@ -1,0 +1,337 @@
+[
+  {
+    "objectID": "core/management_config.html",
+    "href": "core/management_config.html",
+    "title": "Management Configuration",
+    "section": "",
+    "text": "This schema defines configuration options for resource usage thresholds and conflict detection. It works with the cjm-fasthtml-settings library for automatic UI generation.\n\n# Example: Accessing schema properties\nprint(f\"Schema name: {RESOURCE_MANAGEMENT_SCHEMA['name']}\")\nprint(f\"Schema title: {RESOURCE_MANAGEMENT_SCHEMA['title']}\")\nprint(f\"\\nDefault settings:\")\nprint(f\"  GPU threshold: {RESOURCE_MANAGEMENT_SCHEMA['properties']['gpu_memory_threshold_percent']['default']}%\")\nprint(f\"  Auto-unload: {RESOURCE_MANAGEMENT_SCHEMA['properties']['enable_auto_unload']['default']}\")\nprint(f\"  Auto-reload: {RESOURCE_MANAGEMENT_SCHEMA['properties']['enable_auto_reload']['default']}\")\n\nSchema name: resource-management\nSchema title: Resource Management Configuration\n\nDefault settings:\n  GPU threshold: 45.0%\n  Auto-unload: True\n  Auto-reload: True\n\n\n\n\nThe gpu_memory_threshold_percent setting determines what percentage of GPU memory usage by an external process is considered a conflict. This helps filter out processes that are just using trivial amounts of GPU memory.\nFor example, with a threshold of 45%: - A Chrome tab using 100MB of a 24GB GPU (0.4%) → Not a conflict - A game using 12GB of a 24GB GPU (50%) → Conflict detected\n\n\n\nThese boolean settings control automatic plugin management:\n\nAuto-Unload: When enabled, switching to a different plugin automatically unloads the previously loaded plugin to free GPU memory\nAuto-Reload: When enabled, configuration changes automatically reload the plugin with the new settings",
+    "crumbs": [
+      "core",
+      "Management Configuration"
+    ]
+  },
+  {
+    "objectID": "core/management_config.html#resource-management-schema",
+    "href": "core/management_config.html#resource-management-schema",
+    "title": "Management Configuration",
+    "section": "",
+    "text": "This schema defines configuration options for resource usage thresholds and conflict detection. It works with the cjm-fasthtml-settings library for automatic UI generation.\n\n# Example: Accessing schema properties\nprint(f\"Schema name: {RESOURCE_MANAGEMENT_SCHEMA['name']}\")\nprint(f\"Schema title: {RESOURCE_MANAGEMENT_SCHEMA['title']}\")\nprint(f\"\\nDefault settings:\")\nprint(f\"  GPU threshold: {RESOURCE_MANAGEMENT_SCHEMA['properties']['gpu_memory_threshold_percent']['default']}%\")\nprint(f\"  Auto-unload: {RESOURCE_MANAGEMENT_SCHEMA['properties']['enable_auto_unload']['default']}\")\nprint(f\"  Auto-reload: {RESOURCE_MANAGEMENT_SCHEMA['properties']['enable_auto_reload']['default']}\")\n\nSchema name: resource-management\nSchema title: Resource Management Configuration\n\nDefault settings:\n  GPU threshold: 45.0%\n  Auto-unload: True\n  Auto-reload: True\n\n\n\n\nThe gpu_memory_threshold_percent setting determines what percentage of GPU memory usage by an external process is considered a conflict. This helps filter out processes that are just using trivial amounts of GPU memory.\nFor example, with a threshold of 45%: - A Chrome tab using 100MB of a 24GB GPU (0.4%) → Not a conflict - A game using 12GB of a 24GB GPU (50%) → Conflict detected\n\n\n\nThese boolean settings control automatic plugin management:\n\nAuto-Unload: When enabled, switching to a different plugin automatically unloads the previously loaded plugin to free GPU memory\nAuto-Reload: When enabled, configuration changes automatically reload the plugin with the new settings",
+    "crumbs": [
+      "core",
+      "Management Configuration"
+    ]
+  },
+  {
+    "objectID": "core/manager.html",
+    "href": "core/manager.html",
+    "title": "Resource Manager",
+    "section": "",
+    "text": "The resource manager tracks different types of resources (GPU memory, system memory) and their availability status.\n\nsource\n\n\n\n ResourceType (value, names=None, module=None, qualname=None, type=None,\n               start=1, boundary=None)\n\nTypes of resources to monitor.\n\nsource\n\n\n\n\n ResourceStatus (value, names=None, module=None, qualname=None, type=None,\n                 start=1, boundary=None)\n\nStatus of resource availability.",
+    "crumbs": [
+      "core",
+      "Resource Manager"
+    ]
+  },
+  {
+    "objectID": "core/manager.html#resource-types-and-status",
+    "href": "core/manager.html#resource-types-and-status",
+    "title": "Resource Manager",
+    "section": "",
+    "text": "The resource manager tracks different types of resources (GPU memory, system memory) and their availability status.\n\nsource\n\n\n\n ResourceType (value, names=None, module=None, qualname=None, type=None,\n               start=1, boundary=None)\n\nTypes of resources to monitor.\n\nsource\n\n\n\n\n ResourceStatus (value, names=None, module=None, qualname=None, type=None,\n                 start=1, boundary=None)\n\nStatus of resource availability.",
+    "crumbs": [
+      "core",
+      "Resource Manager"
+    ]
+  },
+  {
+    "objectID": "core/manager.html#data-structures",
+    "href": "core/manager.html#data-structures",
+    "title": "Resource Manager",
+    "section": "Data Structures",
+    "text": "Data Structures\nData classes for tracking resource conflicts and worker states.\n\nsource\n\nResourceConflict\n\n ResourceConflict (resource_type:__main__.ResourceType,\n                   status:__main__.ResourceStatus, app_pids:List[int],\n                   external_pids:List[int],\n                   app_processes:List[Dict[str,Any]],\n                   external_processes:List[Dict[str,Any]])\n\nInformation about a resource conflict.\n\nsource\n\n\nWorkerState\n\n WorkerState (pid:int, worker_type:str, job_id:Optional[str]=None,\n              plugin_id:Optional[str]=None,\n              plugin_name:Optional[str]=None,\n              loaded_plugin_resource:Optional[str]=None,\n              config:Optional[Dict[str,Any]]=None, status:str='idle',\n              execution_mode:Optional[str]=None,\n              child_pids:List[int]=&lt;factory&gt;,\n              container_id:Optional[str]=None,\n              conda_env:Optional[str]=None, is_remote:bool=False,\n              remote_resource:Optional[Dict[str,Any]]=None)\n\n*State of a worker process.\nEnhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.*\n\n# Example: Creating a worker state\nworker = WorkerState(\n    pid=12345,\n    worker_type=\"transcription\",\n    plugin_name=\"whisper\",\n    status=\"idle\"\n)\n\nprint(f\"Worker PID: {worker.pid}\")\nprint(f\"Worker type: {worker.worker_type}\")\nprint(f\"Plugin: {worker.plugin_name}\")\nprint(f\"Status: {worker.status}\")\n\nWorker PID: 12345\nWorker type: transcription\nPlugin: whisper\nStatus: idle\n\n\n\n\nEnhanced Worker State\nThe WorkerState dataclass now supports lifecycle-aware and cloud-aware plugins: - Lifecycle fields: execution_mode, child_pids, container_id, conda_env - Cloud fields: is_remote, remote_resource\nThese fields are optional and only used when working with plugins from cjm-fasthtml-plugins that implement the LifecycleAwarePlugin or CloudAwarePlugin protocols.",
+    "crumbs": [
+      "core",
+      "Resource Manager"
+    ]
+  },
+  {
+    "objectID": "core/manager.html#configuration-keys",
+    "href": "core/manager.html#configuration-keys",
+    "title": "Resource Manager",
+    "section": "Configuration Keys",
+    "text": "Configuration Keys\nCommon configuration keys that indicate the plugin resource being used.",
+    "crumbs": [
+      "core",
+      "Resource Manager"
+    ]
+  },
+  {
+    "objectID": "core/manager.html#resourcemanager",
+    "href": "core/manager.html#resourcemanager",
+    "title": "Resource Manager",
+    "section": "ResourceManager",
+    "text": "ResourceManager\nThe ResourceManager class tracks worker processes and provides methods to check resource availability and detect conflicts.\n\nsource\n\nResourceManager\n\n ResourceManager (gpu_memory_threshold_percent:float=45.0)\n\nManages resource tracking and conflict detection for the application. Tracks PIDs associated with application workers (transcription, LLM, etc.) and provides methods to check resource availability and conflicts. Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ngpu_memory_threshold_percent\nfloat\n45.0\nGPU memory usage threshold; external processes using more than this percentage are considered conflicts\n\n\n\n\n\nExample: Basic Usage\n\n# Create a resource manager\nmanager = ResourceManager(gpu_memory_threshold_percent=45.0)\n\n# Register a worker\nmanager.register_worker(\n    pid=12345,\n    worker_type=\"transcription\",\n    plugin_name=\"whisper\",\n    config={\"model_id\": \"whisper-large-v3\"}\n)\n\n# Get worker info\nworker = manager.get_worker_by_pid(12345)\nprint(f\"Worker type: {worker.worker_type}\")\nprint(f\"Plugin: {worker.plugin_name}\")\nprint(f\"Status: {worker.status}\")\n\n# Update worker state\nmanager.update_worker_state(12345, status=\"running\", job_id=\"job-123\")\nworker = manager.get_worker_by_pid(12345)\nprint(f\"Updated status: {worker.status}\")\nprint(f\"Job ID: {worker.job_id}\")\n\n# Get worker by job\nworker_by_job = manager.get_worker_by_job(\"job-123\")\nprint(f\"Worker for job-123: PID {worker_by_job.pid}\")\n\n# Check active worker types\nprint(f\"Active worker types: {manager.get_active_worker_types()}\")\n\n# Unregister worker\nmanager.unregister_worker(12345)\nprint(f\"Workers after unregister: {len(manager.get_all_workers())}\")\n\nWorker type: transcription\nPlugin: whisper\nStatus: idle\nUpdated status: running\nJob ID: job-123\nWorker for job-123: PID 12345\nActive worker types: {'transcription'}\nWorkers after unregister: 0\n\n\n\n# Example: Mock lifecycle-aware plugin\nclass MockVLLMPlugin:\n    \"\"\"Simulates a vLLM plugin that spawns child processes.\"\"\"\n    def get_execution_mode(self):\n        from enum import Enum\n        class MockMode(Enum):\n            SUBPROCESS = \"subprocess\"\n        return MockMode.SUBPROCESS\n    \n    def get_child_pids(self):\n        return [99001, 99002, 99003]  # Mock child PIDs\n    \n    def get_managed_resources(self):\n        return {\n            'server_url': 'http://localhost:8000',\n            'is_running': True\n        }\n    \n    def force_cleanup(self):\n        pass\n\n# Register worker with lifecycle-aware plugin\nmanager = ResourceManager()\nmock_plugin = MockVLLMPlugin()\n\n# The manager will automatically detect child processes\nmanager.register_worker(\n    pid=12345,\n    worker_type=\"transcription\",\n    plugin_id=\"transcription_voxtral_vllm\",\n    plugin_name=\"voxtral_vllm\",\n    plugin_instance=mock_plugin\n)\n\nworker = manager.get_worker_by_pid(12345)\nprint(f\"Worker PID: {worker.pid}\")\nprint(f\"Execution mode: {worker.execution_mode}\")\nprint(f\"Child PIDs: {worker.child_pids}\")\nprint(f\"All related PIDs: {manager.get_all_related_pids(12345)}\")\nprint(f\"All app PIDs (including children): {sorted(manager.get_all_app_pids_including_children())}\")\n\nWorker PID: 12345\nExecution mode: subprocess\nChild PIDs: [99001, 99002, 99003]\nAll related PIDs: [12345, 99001, 99002, 99003]\nAll app PIDs (including children): [12345, 99001, 99002, 99003]\n\n\n\n\nExample: Enhanced Usage with Lifecycle/Cloud Plugins\nWhen using plugins from cjm-fasthtml-plugins, the resource manager automatically detects and tracks: - Child processes spawned by plugins - Cloud/remote resources - Container IDs and conda environments",
+    "crumbs": [
+      "core",
+      "Resource Manager"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "cjm-fasthtml-resources",
+    "section": "",
+    "text": "pip install cjm_fasthtml_resources",
+    "crumbs": [
+      "cjm-fasthtml-resources"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "cjm-fasthtml-resources",
+    "section": "",
+    "text": "pip install cjm_fasthtml_resources",
+    "crumbs": [
+      "cjm-fasthtml-resources"
+    ]
+  },
+  {
+    "objectID": "index.html#project-structure",
+    "href": "index.html#project-structure",
+    "title": "cjm-fasthtml-resources",
+    "section": "Project Structure",
+    "text": "Project Structure\nnbs/\n├── core/ (4)\n│   ├── management_config.ipynb  # Configuration schema for resource management settings including GPU thresholds\n│   ├── manager.ipynb            # Track worker processes and detect resource conflicts for GPU/CPU usage\n│   ├── monitoring_config.ipynb  # Configuration schema for resource monitoring refresh intervals and SSE settings\n│   └── validation.ipynb         # Validate resource availability before job execution and determine appropriate actions\n└── utils/ (2)\n    ├── plugin_utils.ipynb   # Utilities for analyzing plugin configurations and resource requirements\n    └── route_helpers.ipynb  # Helper utilities for resource monitoring route handlers\nTotal: 6 notebooks across 2 directories",
+    "crumbs": [
+      "cjm-fasthtml-resources"
+    ]
+  },
+  {
+    "objectID": "index.html#module-dependencies",
+    "href": "index.html#module-dependencies",
+    "title": "cjm-fasthtml-resources",
+    "section": "Module Dependencies",
+    "text": "Module Dependencies\ngraph LR\n    core_management_config[core.management_config&lt;br/&gt;Management Configuration]\n    core_manager[core.manager&lt;br/&gt;Resource Manager]\n    core_monitoring_config[core.monitoring_config&lt;br/&gt;Monitoring Configuration]\n    core_validation[core.validation&lt;br/&gt;Resource Validation]\n    utils_plugin_utils[utils.plugin_utils&lt;br/&gt;Plugin Resource Utilities]\n    utils_route_helpers[utils.route_helpers&lt;br/&gt;Route Helpers]\n\n    core_validation --&gt; core_manager\n    utils_plugin_utils --&gt; core_manager\n2 cross-module dependencies detected",
+    "crumbs": [
+      "cjm-fasthtml-resources"
+    ]
+  },
+  {
+    "objectID": "index.html#cli-reference",
+    "href": "index.html#cli-reference",
+    "title": "cjm-fasthtml-resources",
+    "section": "CLI Reference",
+    "text": "CLI Reference\nNo CLI commands found in this project.",
+    "crumbs": [
+      "cjm-fasthtml-resources"
+    ]
+  },
+  {
+    "objectID": "index.html#module-overview",
+    "href": "index.html#module-overview",
+    "title": "cjm-fasthtml-resources",
+    "section": "Module Overview",
+    "text": "Module Overview\nDetailed documentation for each module in the project:\n\nManagement Configuration (management_config.ipynb)\n\nConfiguration schema for resource management settings including GPU thresholds\n\n\nImport\nfrom cjm_fasthtml_resources.core.management_config import (\n    RESOURCE_MANAGEMENT_SCHEMA\n)\n\n\nVariables\nRESOURCE_MANAGEMENT_SCHEMA = {7 items}\n\n\n\nResource Manager (manager.ipynb)\n\nTrack worker processes and detect resource conflicts for GPU/CPU usage\n\n\nImport\nfrom cjm_fasthtml_resources.core.manager import (\n    PLUGIN_RESOURCE_CONFIG_KEYS,\n    ResourceType,\n    ResourceStatus,\n    ResourceConflict,\n    WorkerState,\n    ResourceManager\n)\n\n\nClasses\nclass ResourceType(Enum):\n    \"Types of resources to monitor.\"\nclass ResourceStatus(Enum):\n    \"Status of resource availability.\"\n@dataclass\nclass ResourceConflict:\n    \"Information about a resource conflict.\"\n    \n    resource_type: ResourceType\n    status: ResourceStatus\n    app_pids: List[int]  # PIDs from this application using the resource\n    external_pids: List[int]  # External PIDs using the resource\n    app_processes: List[Dict[str, Any]]  # Detailed info about app processes\n    external_processes: List[Dict[str, Any]]  # Detailed info about external processes\n@dataclass\nclass WorkerState:\n    \"\"\"\n    State of a worker process.\n    \n    Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.\n    \"\"\"\n    \n    pid: int\n    worker_type: str  # e.g., \"transcription\", \"llm\"\n    job_id: Optional[str]\n    plugin_id: Optional[str]\n    plugin_name: Optional[str]\n    loaded_plugin_resource: Optional[str]  # The plugin resource identifier currently loaded\n    config: Optional[Dict[str, Any]]  # Current plugin configuration\n    status: str = 'idle'  # idle, running, busy\n    execution_mode: Optional[str]  # Execution mode (in_process, subprocess, cloud_gpu, etc.)\n    child_pids: List[int] = field(...)  # PIDs of child processes\n    container_id: Optional[str]  # Docker container ID if applicable\n    conda_env: Optional[str]  # Conda environment name if applicable\n    is_remote: bool = False  # Whether this worker uses remote/cloud resources\n    remote_resource: Optional[Dict[str, Any]]  # Remote resource info (serialized RemoteResourceInfo)\nclass ResourceManager:\n    def __init__(\n        self,\n        gpu_memory_threshold_percent:float=45.0 # GPU memory usage threshold; external processes using more than this percentage are considered conflicts\n    )\n    \"Manages resource tracking and conflict detection for the application. Tracks PIDs associated with application workers (transcription, LLM, etc.) and provides methods to check resource availability and conflicts. Enhanced to support lifecycle-aware and cloud-aware plugins from cjm-fasthtml-plugins.\"\n    \n    def __init__(\n            self,\n            gpu_memory_threshold_percent:float=45.0 # GPU memory usage threshold; external processes using more than this percentage are considered conflicts\n        )\n        \"Initialize the resource manager.\"\n    \n    def register_worker(\n            self,\n            pid:int, # Process ID of the worker\n            worker_type:str, # Type of worker (e.g., \"transcription\", \"llm\")\n            job_id:Optional[str]=None, # Optional job ID if worker is processing a job\n            plugin_id:Optional[str]=None, # Optional plugin unique ID\n            plugin_name:Optional[str]=None, # Optional plugin name\n            loaded_plugin_resource:Optional[str]=None, # Optional identifier of the loaded plugin resource\n            config:Optional[Dict[str, Any]]=None, # Optional plugin configuration\n            plugin_instance:Optional[Any]=None # Optional plugin instance for lifecycle/cloud protocol detection\n        )\n        \"Register a worker process with the resource manager.\"\n    \n    def get_all_related_pids(\n            self,\n            parent_pid:int # Parent worker PID\n        ) -&gt; List[int]: # List of all PIDs (parent + children)\n        \"Get parent PID and all child PIDs managed by this worker.\"\n    \n    def update_worker_state(\n            self,\n            pid:int, # Process ID of the worker\n            job_id:Optional[str]=None, # Optional job ID to update\n            plugin_id:Optional[str]=None, # Optional plugin ID to update\n            plugin_name:Optional[str]=None, # Optional plugin name to update\n            loaded_plugin_resource:Optional[str]=None, # Optional loaded plugin resource to update\n            config:Optional[Dict[str, Any]]=None, # Optional config to update\n            status:Optional[str]=None # Optional status to update\n        )\n        \"Update the state of a registered worker.\"\n    \n    def unregister_worker(\n            self,\n            pid:int # Process ID of the worker to unregister\n        )\n        \"Unregister a worker process.\"\n    \n    def get_worker_by_pid(\n            self,\n            pid:int # Process ID\n        ) -&gt; Optional[WorkerState]: # Worker state or None\n        \"Get worker state by PID.\"\n    \n    def get_worker_by_job(\n            self,\n            job_id:str # Job ID\n        ) -&gt; Optional[WorkerState]: # Worker state or None\n        \"Get worker state by job ID.\"\n    \n    def get_all_workers(self) -&gt; List[WorkerState]: # List of all registered workers\n            \"\"\"Get all registered workers.\"\"\"\n            return list(self._worker_states.values())\n    \n        def get_app_pids(self) -&gt; Set[int]: # Set of all PIDs managed by this application (parents only)\n        \"Get all registered workers.\"\n    \n    def get_app_pids(self) -&gt; Set[int]: # Set of all PIDs managed by this application (parents only)\n            \"\"\"Get all PIDs managed by this application (parents only).\"\"\"\n            return set(self._worker_states.keys())\n        \n        def get_all_app_pids_including_children(self) -&gt; Set[int]: # Set of all PIDs (parents and children)\n        \"Get all PIDs managed by this application (parents only).\"\n    \n    def get_all_app_pids_including_children(self) -&gt; Set[int]: # Set of all PIDs (parents and children)\n            \"\"\"Get all PIDs managed by this application including child processes.\"\"\"\n            all_pids = set(self._worker_states.keys())\n            for worker in self._worker_states.values()\n        \"Get all PIDs managed by this application including child processes.\"\n    \n    def get_workers_by_type(\n            self,\n            worker_type:str # Type of worker (e.g., \"transcription\", \"llm\", \"ollama\")\n        ) -&gt; List[WorkerState]: # List of workers matching the type\n        \"Get all workers of a specific type.\"\n    \n    def get_active_worker_types(self) -&gt; Set[str]: # Set of worker type strings\n            \"\"\"Get set of all active worker types.\"\"\"\n            return {w.worker_type for w in self._worker_states.values()}\n    \n        def has_worker_type(\n            self,\n            worker_type:str # Type of worker to check\n        ) -&gt; bool: # True if at least one worker of this type exists\n        \"Get set of all active worker types.\"\n    \n    def has_worker_type(\n            self,\n            worker_type:str # Type of worker to check\n        ) -&gt; bool: # True if at least one worker of this type exists\n        \"Check if a worker of the specified type exists.\"\n    \n    def get_cloud_workers(self) -&gt; List[WorkerState]: # List of workers with is_remote=True\n            \"\"\"Get all workers using cloud/remote resources.\"\"\"\n            return [w for w in self._worker_states.values() if w.is_remote]\n        \n        def estimate_total_cloud_cost(\n            self,\n            duration_hours:float=1.0 # Duration to estimate for\n        ) -&gt; float: # Total estimated cost in USD\n        \"Get all workers using cloud/remote resources.\"\n    \n    def estimate_total_cloud_cost(\n            self,\n            duration_hours:float=1.0 # Duration to estimate for\n        ) -&gt; float: # Total estimated cost in USD\n        \"Estimate total cost of all running cloud resources.\"\n    \n    def check_gpu_availability(self) -&gt; ResourceConflict: # ResourceConflict with details about GPU usage\n            \"\"\"Check GPU availability and identify conflicts. Uses configurable GPU memory threshold to determine if external processes are using significant GPU resources. Enhanced to detect child processes from lifecycle-aware plugins.\"\"\"\n            try\n        \"Check GPU availability and identify conflicts. Uses configurable GPU memory threshold to determine if external processes are using significant GPU resources. Enhanced to detect child processes from lifecycle-aware plugins.\"\n    \n    def check_memory_availability(\n            self,\n            threshold_percent:float=90.0 # Memory usage threshold to consider as conflict\n        ) -&gt; ResourceConflict: # ResourceConflict with details about memory usage\n        \"Check system memory availability.\"\n\n\nVariables\nPLUGIN_RESOURCE_CONFIG_KEYS = [5 items]\n\n\n\nMonitoring Configuration (monitoring_config.ipynb)\n\nConfiguration schema for resource monitoring refresh intervals and SSE settings\n\n\nImport\nfrom cjm_fasthtml_resources.core.monitoring_config import (\n    RESOURCE_MONITOR_SCHEMA,\n    LAST_UPDATE_TIMES,\n    SSE_CONFIG\n)\n\n\nVariables\nRESOURCE_MONITOR_SCHEMA = {7 items}\nLAST_UPDATE_TIMES = {7 items}\nSSE_CONFIG = {3 items}\n\n\n\nPlugin Resource Utilities (plugin_utils.ipynb)\n\nUtilities for analyzing plugin configurations and resource requirements\n\n\nImport\nfrom cjm_fasthtml_resources.utils.plugin_utils import (\n    is_local_plugin,\n    uses_gpu_device,\n    get_plugin_resource_identifier,\n    compare_plugin_resources,\n    get_plugin_resource_requirements\n)\n\n\nFunctions\ndef is_local_plugin(\n    plugin_meta # Plugin metadata with config_schema attribute\n) -&gt; bool: # True if plugin is local, False if API-based\n    \"Check if a plugin is local (vs API-based).\"\ndef uses_gpu_device(\n    \"Check if a plugin is configured to use GPU.\"\ndef get_plugin_resource_identifier(\n    \"Extract the plugin resource identifier from plugin configuration. Checks common plugin resource configuration keys like 'resource_id', 'model_id', 'model', 'model_name', etc.\"\ndef compare_plugin_resources(\n    config1:Dict[str, Any], # First plugin configuration\n    config2:Dict[str, Any] # Second plugin configuration\n) -&gt; bool: # True if both configs specify the same plugin resource, False otherwise\n    \"Compare two plugin configurations to see if they use the same plugin resource.\"\ndef get_plugin_resource_requirements(\n    plugin_id:str, # Unique plugin ID\n    plugin_registry, # Plugin registry instance with get_plugin, load_plugin_config methods\n    plugin_config:Optional[Dict[str, Any]]=None # Optional plugin configuration\n) -&gt; Dict[str, Any]: # Dictionary with resource requirement information (is_local, uses_gpu, plugin_resource, device)\n    \"Get resource requirements for a plugin.\"\n\n\n\nRoute Helpers (route_helpers.ipynb)\n\nHelper utilities for resource monitoring route handlers\n\n\nImport\nfrom cjm_fasthtml_resources.utils.route_helpers import (\n    wrap_card_in_container,\n    create_card_update\n)\n\n\nFunctions\ndef wrap_card_in_container(\n    content, # Card content to wrap\n    html_id, # HTML ID for the container\n    card_cls=None, # Card class (optional, can be provided via DaisyUI)\n    bg_cls=None, # Background class (optional, can be provided via DaisyUI)\n    shadow_cls=None, # Shadow class (optional, can be provided via Tailwind)\n    **kwargs # Additional attributes for the Div\n): # Wrapped card container (Div)\n    \"Wrap card content in a Div container with standard styling. This consolidates the common pattern of wrapping monitoring cards in styled containers.\"\ndef create_card_update(\n    render_fn:Callable, # Function to render the card\n    info:Dict[str, Any], # Info dictionary to pass to render function\n    target_id:str, # Target HTML ID for the swap\n    swap_type:str=\"outerHTML\" # Type of swap\n): # OOB swap element\n    \"Create an OOB swap update for a card. This consolidates the pattern of creating OOB swaps for card updates in SSE streaming.\"\n\n\n\nResource Validation (validation.ipynb)\n\nValidate resource availability before job execution and determine appropriate actions\n\n\nImport\nfrom cjm_fasthtml_resources.core.validation import (\n    ValidationAction,\n    ValidationResult,\n    validate_resources_for_job,\n    validation_result_to_error\n)\n\n\nFunctions\ndef validate_resources_for_job(\n    resource_manager, # ResourceManager instance\n    plugin_registry, # Plugin registry protocol (has get_plugin, load_plugin_config methods)\n    get_plugin_resource_requirements, # Function: (plugin_id, config) -&gt; Dict with requirements\n    compare_plugin_resources, # Function: (config1, config2) -&gt; bool (same resource?)\n    get_plugin_resource_identifier, # Function: (config) -&gt; str (resource ID)\n    plugin_id:str, # Unique plugin ID\n    plugin_config:Optional[Dict[str, Any]]=None, # Plugin configuration (will load if not provided)\n    worker_pid:Optional[int]=None, # PID of the worker that will run the job (if known)\n    worker_type:str=\"transcription\", # Type of worker (e.g., \"transcription\", \"llm\", \"ollama\")\n    verbose:bool=False # Whether to print verbose logging\n) -&gt; ValidationResult: # ValidationResult with action to take\n    \"Validate if resources are available to run a job with the specified plugin. This function is dependency-injected with helper functions to avoid tight coupling with specific plugin registry implementations.\"\ndef validation_result_to_error(\n    result: ValidationResult,  # Validation result to convert\n    plugin_id: Optional[str] = None,  # Plugin ID for error context\n    job_id: Optional[str] = None,  # Job ID for error context\n    worker_pid: Optional[int] = None,  # Worker PID for error context\n    **extra_context  # Additional context fields\n) -&gt; Optional[Exception]:  # Structured error based on validation action, or None if no error needed\n    \"Convert a ValidationResult into a structured error. Requires cjm-error-handling library.\"\n\n\nClasses\nclass ValidationAction(Enum):\n    \"Actions that can be taken based on validation results.\"\n@dataclass\nclass ValidationResult:\n    \"Result of resource validation.\"\n    \n    action: ValidationAction\n    can_proceed: bool\n    message: str\n    conflict: Optional[ResourceConflict]\n    current_worker: Optional[WorkerState]\n    plugin_name_to_reload: Optional[str]  # Plugin name to reload\n    new_config: Optional[Dict[str, Any]]  # Config for reload",
+    "crumbs": [
+      "cjm-fasthtml-resources"
+    ]
+  },
+  {
+    "objectID": "utils/plugin_utils.html",
+    "href": "utils/plugin_utils.html",
+    "title": "Plugin Resource Utilities",
+    "section": "",
+    "text": "Helper functions to determine if a plugin is local vs API-based.\n\nsource\n\n\n\n is_local_plugin (plugin_meta)\n\nCheck if a plugin is local (vs API-based).\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nplugin_meta\n\nPlugin metadata with config_schema attribute\n\n\nReturns\nbool\nTrue if plugin is local, False if API-based\n\n\n\nExample plugin metadata structure:\n# Local plugin (works with any metadata object with config_schema)\nlocal_plugin = PluginMetadata(\n    name=\"whisper\",\n    config_schema={\n        \"properties\": {\n            \"model_id\": {\"type\": \"string\"},\n            \"device\": {\"type\": \"string\"}\n        }\n    }\n)\n\n# API-based plugin  \napi_plugin = PluginMetadata(\n    name=\"openai-whisper\",\n    config_schema={\n        \"properties\": {\n            \"api_key\": {\"type\": \"string\"},  # Presence of api_key indicates API-based\n            \"model\": {\"type\": \"string\"}\n        }\n    }\n)\nCompatibility: These utilities are compatible with: - PluginMetadata from cjm-fasthtml-plugins - SimplePluginRegistry from cjm-fasthtml-settings - UnifiedPluginRegistry from cjm-fasthtml-plugins - Any custom object with a config_schema attribute",
+    "crumbs": [
+      "utils",
+      "Plugin Resource Utilities"
+    ]
+  },
+  {
+    "objectID": "utils/plugin_utils.html#plugin-type-detection",
+    "href": "utils/plugin_utils.html#plugin-type-detection",
+    "title": "Plugin Resource Utilities",
+    "section": "",
+    "text": "Helper functions to determine if a plugin is local vs API-based.\n\nsource\n\n\n\n is_local_plugin (plugin_meta)\n\nCheck if a plugin is local (vs API-based).\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nplugin_meta\n\nPlugin metadata with config_schema attribute\n\n\nReturns\nbool\nTrue if plugin is local, False if API-based\n\n\n\nExample plugin metadata structure:\n# Local plugin (works with any metadata object with config_schema)\nlocal_plugin = PluginMetadata(\n    name=\"whisper\",\n    config_schema={\n        \"properties\": {\n            \"model_id\": {\"type\": \"string\"},\n            \"device\": {\"type\": \"string\"}\n        }\n    }\n)\n\n# API-based plugin  \napi_plugin = PluginMetadata(\n    name=\"openai-whisper\",\n    config_schema={\n        \"properties\": {\n            \"api_key\": {\"type\": \"string\"},  # Presence of api_key indicates API-based\n            \"model\": {\"type\": \"string\"}\n        }\n    }\n)\nCompatibility: These utilities are compatible with: - PluginMetadata from cjm-fasthtml-plugins - SimplePluginRegistry from cjm-fasthtml-settings - UnifiedPluginRegistry from cjm-fasthtml-plugins - Any custom object with a config_schema attribute",
+    "crumbs": [
+      "utils",
+      "Plugin Resource Utilities"
+    ]
+  },
+  {
+    "objectID": "utils/plugin_utils.html#gpu-detection",
+    "href": "utils/plugin_utils.html#gpu-detection",
+    "title": "Plugin Resource Utilities",
+    "section": "GPU Detection",
+    "text": "GPU Detection\nHelper functions to determine if a plugin will use GPU resources.\n\nsource\n\nuses_gpu_device\n\n uses_gpu_device (plugin_config:Dict[str,Any])\n\nCheck if a plugin is configured to use GPU.\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nplugin_config\nDict\nThe plugin’s current configuration\n\n\nReturns\nbool\nTrue if plugin will use GPU, False otherwise\n\n\n\n\n# Example: Check various device configurations\nconfigs = [\n    {\"device\": \"cuda\"},\n    {\"device\": \"cuda:0\"},\n    {\"device\": \"cpu\"},\n    {\"device\": \"auto\"},\n    {\"device\": \"mps\"},\n    {}  # No device specified\n]\n\nfor config in configs:\n    device = config.get(\"device\", \"(not specified)\")\n    uses_gpu = uses_gpu_device(config)\n    print(f\"Device '{device}': GPU={uses_gpu}\")\n\nDevice 'cuda': GPU=True\nDevice 'cuda:0': GPU=True\nDevice 'cpu': GPU=False\nDevice 'auto': GPU=True\nDevice 'mps': GPU=True\nDevice '(not specified)': GPU=False",
+    "crumbs": [
+      "utils",
+      "Plugin Resource Utilities"
+    ]
+  },
+  {
+    "objectID": "utils/plugin_utils.html#resource-identifier-extraction",
+    "href": "utils/plugin_utils.html#resource-identifier-extraction",
+    "title": "Plugin Resource Utilities",
+    "section": "Resource Identifier Extraction",
+    "text": "Resource Identifier Extraction\nExtract the plugin resource identifier (model ID, model path, etc.) from configuration.\n\nsource\n\nget_plugin_resource_identifier\n\n get_plugin_resource_identifier (plugin_config:Dict[str,Any])\n\nExtract the plugin resource identifier from plugin configuration. Checks common plugin resource configuration keys like ‘resource_id’, ‘model_id’, ‘model’, ‘model_name’, etc.\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nplugin_config\nDict\nThe plugin’s configuration\n\n\nReturns\nOptional\nPlugin resource identifier string, or None if not found\n\n\n\n\n# Example: Extract resource identifiers from different configs\nconfigs = [\n    {\"model_id\": \"whisper-large-v3\", \"device\": \"cuda\"},\n    {\"model\": \"llama-3.1-8b\", \"device\": \"auto\"},\n    {\"model_path\": \"/models/custom-model\", \"device\": \"cpu\"},\n    {\"device\": \"cuda\"}  # No resource ID\n]\n\nfor config in configs:\n    resource_id = get_plugin_resource_identifier(config)\n    print(f\"Config {config}: Resource ID = {resource_id}\")\n\nConfig {'model_id': 'whisper-large-v3', 'device': 'cuda'}: Resource ID = whisper-large-v3\nConfig {'model': 'llama-3.1-8b', 'device': 'auto'}: Resource ID = llama-3.1-8b\nConfig {'model_path': '/models/custom-model', 'device': 'cpu'}: Resource ID = /models/custom-model\nConfig {'device': 'cuda'}: Resource ID = None",
+    "crumbs": [
+      "utils",
+      "Plugin Resource Utilities"
+    ]
+  },
+  {
+    "objectID": "utils/plugin_utils.html#resource-comparison",
+    "href": "utils/plugin_utils.html#resource-comparison",
+    "title": "Plugin Resource Utilities",
+    "section": "Resource Comparison",
+    "text": "Resource Comparison\nCompare two plugin configurations to determine if they use the same resource.\n\nsource\n\ncompare_plugin_resources\n\n compare_plugin_resources (config1:Dict[str,Any], config2:Dict[str,Any])\n\nCompare two plugin configurations to see if they use the same plugin resource.\n\n\n\n\n\n\n\n\n\nType\nDetails\n\n\n\n\nconfig1\nDict\nFirst plugin configuration\n\n\nconfig2\nDict\nSecond plugin configuration\n\n\nReturns\nbool\nTrue if both configs specify the same plugin resource, False otherwise\n\n\n\n\n# Example: Compare configurations\nconfig_a = {\"model_id\": \"whisper-large-v3\", \"device\": \"cuda\"}\nconfig_b = {\"model_id\": \"whisper-large-v3\", \"device\": \"cpu\"}  # Same resource, different device\nconfig_c = {\"model_id\": \"whisper-medium\", \"device\": \"cuda\"}  # Different resource\n\nprint(f\"A vs B (same resource): {compare_plugin_resources(config_a, config_b)}\")\nprint(f\"A vs C (different resource): {compare_plugin_resources(config_a, config_c)}\")\nprint(f\"B vs C (different resource): {compare_plugin_resources(config_b, config_c)}\")\n\nA vs B (same resource): True\nA vs C (different resource): False\nB vs C (different resource): False",
+    "crumbs": [
+      "utils",
+      "Plugin Resource Utilities"
+    ]
+  },
+  {
+    "objectID": "utils/plugin_utils.html#combined-resource-requirements",
+    "href": "utils/plugin_utils.html#combined-resource-requirements",
+    "title": "Plugin Resource Utilities",
+    "section": "Combined Resource Requirements",
+    "text": "Combined Resource Requirements\nGet comprehensive resource requirements for a plugin.\n\nsource\n\nget_plugin_resource_requirements\n\n get_plugin_resource_requirements (plugin_id:str, plugin_registry,\n                                   plugin_config:Optional[Dict[str,Any]]=N\n                                   one)\n\nGet resource requirements for a plugin.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nplugin_id\nstr\n\nUnique plugin ID\n\n\nplugin_registry\n\n\nPlugin registry instance with get_plugin, load_plugin_config methods\n\n\nplugin_config\nOptional\nNone\nOptional plugin configuration\n\n\nReturns\nDict\n\nDictionary with resource requirement information (is_local, uses_gpu, plugin_resource, device)\n\n\n\nThis function is the main entry point for getting plugin resource information. It combines all the other utility functions to provide a complete picture of a plugin’s resource requirements.",
+    "crumbs": [
+      "utils",
+      "Plugin Resource Utilities"
+    ]
+  },
+  {
+    "objectID": "utils/route_helpers.html",
+    "href": "utils/route_helpers.html",
+    "title": "Route Helpers",
+    "section": "",
+    "text": "Wrap card content in a styled container for consistent presentation.\n\nsource\n\n\n\n wrap_card_in_container (content, html_id, card_cls=None, bg_cls=None,\n                         shadow_cls=None, **kwargs)\n\nWrap card content in a Div container with standard styling. This consolidates the common pattern of wrapping monitoring cards in styled containers.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ncontent\n\n\nCard content to wrap\n\n\nhtml_id\n\n\nHTML ID for the container\n\n\ncard_cls\nNoneType\nNone\nCard class (optional, can be provided via DaisyUI)\n\n\nbg_cls\nNoneType\nNone\nBackground class (optional, can be provided via DaisyUI)\n\n\nshadow_cls\nNoneType\nNone\nShadow class (optional, can be provided via Tailwind)\n\n\nkwargs\nVAR_KEYWORD\n\n\n\n\n\nExample usage with DaisyUI and Tailwind:\nfrom cjm_fasthtml_daisyui.components.data_display.card import card\nfrom cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui\nfrom cjm_fasthtml_tailwind.utilities.effects import shadow\n\nwrapped = wrap_card_in_container(\n    my_card_content,\n    html_id=\"my-card\",\n    card_cls=card,\n    bg_cls=bg_dui.base_100,\n    shadow_cls=shadow.md\n)",
+    "crumbs": [
+      "utils",
+      "Route Helpers"
+    ]
+  },
+  {
+    "objectID": "utils/route_helpers.html#card-container-wrapper",
+    "href": "utils/route_helpers.html#card-container-wrapper",
+    "title": "Route Helpers",
+    "section": "",
+    "text": "Wrap card content in a styled container for consistent presentation.\n\nsource\n\n\n\n wrap_card_in_container (content, html_id, card_cls=None, bg_cls=None,\n                         shadow_cls=None, **kwargs)\n\nWrap card content in a Div container with standard styling. This consolidates the common pattern of wrapping monitoring cards in styled containers.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ncontent\n\n\nCard content to wrap\n\n\nhtml_id\n\n\nHTML ID for the container\n\n\ncard_cls\nNoneType\nNone\nCard class (optional, can be provided via DaisyUI)\n\n\nbg_cls\nNoneType\nNone\nBackground class (optional, can be provided via DaisyUI)\n\n\nshadow_cls\nNoneType\nNone\nShadow class (optional, can be provided via Tailwind)\n\n\nkwargs\nVAR_KEYWORD\n\n\n\n\n\nExample usage with DaisyUI and Tailwind:\nfrom cjm_fasthtml_daisyui.components.data_display.card import card\nfrom cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui\nfrom cjm_fasthtml_tailwind.utilities.effects import shadow\n\nwrapped = wrap_card_in_container(\n    my_card_content,\n    html_id=\"my-card\",\n    card_cls=card,\n    bg_cls=bg_dui.base_100,\n    shadow_cls=shadow.md\n)",
+    "crumbs": [
+      "utils",
+      "Route Helpers"
+    ]
+  },
+  {
+    "objectID": "utils/route_helpers.html#oob-card-update-helper",
+    "href": "utils/route_helpers.html#oob-card-update-helper",
+    "title": "Route Helpers",
+    "section": "OOB Card Update Helper",
+    "text": "OOB Card Update Helper\nCreate out-of-band (OOB) swap updates for cards in SSE streaming.\n\nsource\n\ncreate_card_update\n\n create_card_update (render_fn:Callable, info:Dict[str,Any],\n                     target_id:str, swap_type:str='outerHTML')\n\nCreate an OOB swap update for a card. This consolidates the pattern of creating OOB swaps for card updates in SSE streaming.\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nrender_fn\nCallable\n\nFunction to render the card\n\n\ninfo\nDict\n\nInfo dictionary to pass to render function\n\n\ntarget_id\nstr\n\nTarget HTML ID for the swap\n\n\nswap_type\nstr\nouterHTML\nType of swap\n\n\n\nExample usage in SSE streaming:\nfrom cjm_fasthtml_sysmon.components.cards import render_cpu_card\nfrom cjm_fasthtml_sysmon.monitors.cpu import get_cpu_info\n\n# In your SSE streaming function\nasync def stream_updates():\n    while True:\n        cpu_info = get_cpu_info()\n        \n        # Create OOB update for CPU card\n        update = create_card_update(\n            render_cpu_card,\n            cpu_info,\n            \"cpu-card-body\"\n        )\n        \n        yield sse_message(Div(update))\n        await asyncio.sleep(2)\nThese helpers reduce boilerplate code when working with resource monitoring routes and SSE updates. They provide a consistent pattern while remaining flexible enough to work with different styling libraries and update strategies.",
+    "crumbs": [
+      "utils",
+      "Route Helpers"
+    ]
+  },
+  {
+    "objectID": "core/validation.html",
+    "href": "core/validation.html",
+    "title": "Resource Validation",
+    "section": "",
+    "text": "The validation system returns different actions based on resource availability:\n\nsource\n\n\n\n ValidationAction (value, names=None, module=None, qualname=None,\n                   type=None, start=1, boundary=None)\n\nActions that can be taken based on validation results.",
+    "crumbs": [
+      "core",
+      "Resource Validation"
+    ]
+  },
+  {
+    "objectID": "core/validation.html#validation-actions",
+    "href": "core/validation.html#validation-actions",
+    "title": "Resource Validation",
+    "section": "",
+    "text": "The validation system returns different actions based on resource availability:\n\nsource\n\n\n\n ValidationAction (value, names=None, module=None, qualname=None,\n                   type=None, start=1, boundary=None)\n\nActions that can be taken based on validation results.",
+    "crumbs": [
+      "core",
+      "Resource Validation"
+    ]
+  },
+  {
+    "objectID": "core/validation.html#validation-result",
+    "href": "core/validation.html#validation-result",
+    "title": "Resource Validation",
+    "section": "Validation Result",
+    "text": "Validation Result\nThe result object contains all information needed to make decisions about job execution:\n\nsource\n\nValidationResult\n\n ValidationResult (action:__main__.ValidationAction, can_proceed:bool,\n                   message:str, conflict:Optional[cjm_fasthtml_resources.c\n                   ore.manager.ResourceConflict]=None, current_worker:Opti\n                   onal[cjm_fasthtml_resources.core.manager.WorkerState]=N\n                   one, plugin_name_to_reload:Optional[str]=None,\n                   new_config:Optional[Dict[str,Any]]=None)\n\nResult of resource validation.\n\n# Example: Creating a validation result\nresult = ValidationResult(\n    action=ValidationAction.PROCEED,\n    can_proceed=True,\n    message=\"GPU available. Proceeding with job.\"\n)\n\nprint(f\"Action: {result.action.value}\")\nprint(f\"Can proceed: {result.can_proceed}\")\nprint(f\"Message: {result.message}\")\n\nAction: proceed\nCan proceed: True\nMessage: GPU available. Proceeding with job.",
+    "crumbs": [
+      "core",
+      "Resource Validation"
+    ]
+  },
+  {
+    "objectID": "core/validation.html#resource-validation-function",
+    "href": "core/validation.html#resource-validation-function",
+    "title": "Resource Validation",
+    "section": "Resource Validation Function",
+    "text": "Resource Validation Function\nThis is the main validation function that coordinates resource checks and returns appropriate actions.\nThe validation logic handles several scenarios:\n\nCPU-based plugins: Check system memory availability\nAPI-based plugins: Skip resource validation\nGPU-based plugins: Check GPU availability and handle conflicts\nPlugin switching: Detect when plugins need to be reloaded\nResource conflicts: Identify conflicts with app workers or external processes\n\n\nsource\n\nvalidate_resources_for_job\n\n validate_resources_for_job (resource_manager, plugin_registry,\n                             get_plugin_resource_requirements,\n                             compare_plugin_resources,\n                             get_plugin_resource_identifier,\n                             plugin_id:str,\n                             plugin_config:Optional[Dict[str,Any]]=None,\n                             worker_pid:Optional[int]=None,\n                             worker_type:str='transcription',\n                             verbose:bool=False)\n\nValidate if resources are available to run a job with the specified plugin. This function is dependency-injected with helper functions to avoid tight coupling with specific plugin registry implementations.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nresource_manager\n\n\nResourceManager instance\n\n\nplugin_registry\n\n\nPlugin registry protocol (has get_plugin, load_plugin_config methods)\n\n\nget_plugin_resource_requirements\n\n\nFunction: (plugin_id, config) -&gt; Dict with requirements\n\n\ncompare_plugin_resources\n\n\nFunction: (config1, config2) -&gt; bool (same resource?)\n\n\nget_plugin_resource_identifier\n\n\nFunction: (config) -&gt; str (resource ID)\n\n\nplugin_id\nstr\n\nUnique plugin ID\n\n\nplugin_config\nOptional\nNone\nPlugin configuration (will load if not provided)\n\n\nworker_pid\nOptional\nNone\nPID of the worker that will run the job (if known)\n\n\nworker_type\nstr\ntranscription\nType of worker (e.g., “transcription”, “llm”, “ollama”)\n\n\nverbose\nbool\nFalse\nWhether to print verbose logging\n\n\nReturns\nValidationResult\n\nValidationResult with action to take\n\n\n\nThe validation function uses dependency injection to avoid tight coupling. You provide helper functions that know how to work with your specific plugin registry implementation.",
+    "crumbs": [
+      "core",
+      "Resource Validation"
+    ]
+  },
+  {
+    "objectID": "core/validation.html#error-handling-integration",
+    "href": "core/validation.html#error-handling-integration",
+    "title": "Resource Validation",
+    "section": "Error Handling Integration",
+    "text": "Error Handling Integration\nWhen the cjm-error-handling library is installed, you can convert ValidationResult objects into structured exceptions. This is useful when you want to raise errors instead of returning result objects.\n\nsource\n\nvalidation_result_to_error\n\n validation_result_to_error (result:__main__.ValidationResult,\n                             plugin_id:Optional[str]=None,\n                             job_id:Optional[str]=None,\n                             worker_pid:Optional[int]=None,\n                             **extra_context)\n\nConvert a ValidationResult into a structured error. Requires cjm-error-handling library.\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nresult\nValidationResult\n\nValidation result to convert\n\n\nplugin_id\nOptional\nNone\nPlugin ID for error context\n\n\njob_id\nOptional\nNone\nJob ID for error context\n\n\nworker_pid\nOptional\nNone\nWorker PID for error context\n\n\nextra_context\nVAR_KEYWORD\n\n\n\n\nReturns\nOptional\n\nStructured error based on validation action, or None if no error needed\n\n\n\n\n\nExample: Converting ValidationResult to Errors\nThis shows how to use the error handling integration:\n\n# Example 1: ABORT case (plugin not found)\nif _has_error_handling:\n    abort_result = ValidationResult(\n        action=ValidationAction.ABORT,\n        can_proceed=False,\n        message=\"Plugin transcription_whisper_huge not found.\"\n    )\n    \n    error = validation_result_to_error(\n        abort_result,\n        plugin_id=\"transcription_whisper_huge\",\n        job_id=\"job-123\"\n    )\n    \n    print(\"Example 1: ABORT -&gt; ValidationError\")\n    print(f\"  Error type: {type(error).__name__}\")\n    print(f\"  Message: {error.get_user_message()}\")\n    print(f\"  Retryable: {error.is_retryable}\")\n    print(f\"  Severity: {error.severity.value}\")\n    print(f\"  Context: plugin_id={error.context.plugin_id}, job_id={error.context.job_id}\")\nelse:\n    print(\"cjm-error-handling not installed - skipping example\")\n\nExample 1: ABORT -&gt; ValidationError\n  Error type: ValidationError\n  Message: Plugin transcription_whisper_huge not found.\n  Retryable: False\n  Severity: error\n  Context: plugin_id=transcription_whisper_huge, job_id=job-123\n\n\n\n# Example 2: WAIT_FOR_JOB case (GPU busy with same worker type)\nif _has_error_handling:\n    # Simulate a worker state\n    from cjm_fasthtml_resources.core.manager import WorkerState\n    \n    busy_worker = WorkerState(\n        pid=54321,\n        worker_type=\"transcription\",\n        job_id=\"job-current\",\n        plugin_id=\"whisper_large\",\n        plugin_name=\"whisper_large\",\n        loaded_plugin_resource=\"openai/whisper-large-v3\",\n        config={\"model_id\": \"openai/whisper-large-v3\"},\n        status=\"running\"\n    )\n    \n    wait_result = ValidationResult(\n        action=ValidationAction.WAIT_FOR_JOB,\n        can_proceed=False,\n        message=\"GPU in use by running job (PID 54321). Wait for completion or cancel job.\",\n        current_worker=busy_worker\n    )\n    \n    error = validation_result_to_error(\n        wait_result,\n        plugin_id=\"whisper_base\",\n        job_id=\"job-456\"\n    )\n    \n    print(\"\\nExample 2: WAIT_FOR_JOB -&gt; ResourceError\")\n    print(f\"  Error type: {type(error).__name__}\")\n    print(f\"  Message: {error.get_user_message()}\")\n    print(f\"  Retryable: {error.is_retryable}\")\n    print(f\"  Resource type: {error.resource_type}\")\n    print(f\"  Suggested action: {error.suggested_action}\")\n    print(f\"  Context worker PID: {error.context.worker_pid}\")\nelse:\n    print(\"cjm-error-handling not installed - skipping example\")\n\n\nExample 2: WAIT_FOR_JOB -&gt; ResourceError\n  Error type: ResourceError\n  Message: GPU in use by running job (PID 54321). Wait for completion or cancel job.\n  Retryable: True\n  Resource type: GPU\n  Suggested action: Wait for current job to complete or cancel it\n  Context worker PID: 54321\n\n\n\n# Example 3: Practical usage pattern - raise error if validation fails\nif _has_error_handling:\n    print(\"\\nExample 3: Practical Usage Pattern\")\n    print(\"=\"*60)\n    \n    def start_job_with_validation(plugin_id, job_id, validation_result):\n        \"\"\"Example function showing how to use validation + errors together.\"\"\"\n        # Check if we can proceed\n        if not validation_result.can_proceed:\n            # Convert to error and raise\n            error = validation_result_to_error(\n                validation_result,\n                plugin_id=plugin_id,\n                job_id=job_id\n            )\n            raise error\n        \n        # Validation passed, proceed with job\n        return f\"Job {job_id} started successfully with {plugin_id}\"\n    \n    # Test with ABORT case\n    try:\n        result = ValidationResult(\n            action=ValidationAction.ABORT,\n            can_proceed=False,\n            message=\"Plugin not found\"\n        )\n        start_job_with_validation(\"whisper_huge\", \"job-789\", result)\n    except ValidationError as e:\n        print(f\"Caught ValidationError: {e.get_user_message()}\")\n        print(f\"  Action: Don't retry, fix the plugin ID\")\n    \n    # Test with WAIT_FOR_JOB case (retryable)\n    try:\n        result = ValidationResult(\n            action=ValidationAction.WAIT_FOR_JOB,\n            can_proceed=False,\n            message=\"GPU busy\"\n        )\n        start_job_with_validation(\"whisper_base\", \"job-999\", result)\n    except ResourceError as e:\n        print(f\"\\nCaught ResourceError: {e.get_user_message()}\")\n        print(f\"  Retryable: {e.is_retryable}\")\n        print(f\"  Action: Retry after GPU becomes available\")\n    \n    print(\"\\n\" + \"=\"*60)\nelse:\n    print(\"cjm-error-handling not installed - skipping example\")\n\n\nExample 3: Practical Usage Pattern\n============================================================\nCaught ValidationError: Plugin not found\n  Action: Don't retry, fix the plugin ID\n\nCaught ResourceError: GPU busy\n  Retryable: True\n  Action: Retry after GPU becomes available\n\n============================================================",
+    "crumbs": [
+      "core",
+      "Resource Validation"
+    ]
+  },
+  {
+    "objectID": "core/monitoring_config.html",
+    "href": "core/monitoring_config.html",
+    "title": "Monitoring Configuration",
+    "section": "",
+    "text": "This schema defines configuration options for real-time system resource monitoring. It’s designed to work with the cjm-fasthtml-settings library for automatic UI generation.\n\n# Example: Accessing schema properties\nprint(f\"Schema name: {RESOURCE_MONITOR_SCHEMA['name']}\")\nprint(f\"Schema title: {RESOURCE_MONITOR_SCHEMA['title']}\")\nprint(f\"\\nDefault intervals:\")\nprint(f\"  CPU: {RESOURCE_MONITOR_SCHEMA['properties']['cpu_interval']['default']}s\")\nprint(f\"  Memory: {RESOURCE_MONITOR_SCHEMA['properties']['memory_interval']['default']}s\")\nprint(f\"  GPU: {RESOURCE_MONITOR_SCHEMA['properties']['gpu_interval']['default']}s\")\n\nSchema name: resource-monitoring\nSchema title: Resource Monitor Configuration\n\nDefault intervals:\n  CPU: 2s\n  Memory: 3s\n  GPU: 5s",
+    "crumbs": [
+      "core",
+      "Monitoring Configuration"
+    ]
+  },
+  {
+    "objectID": "core/monitoring_config.html#resource-monitoring-schema",
+    "href": "core/monitoring_config.html#resource-monitoring-schema",
+    "title": "Monitoring Configuration",
+    "section": "",
+    "text": "This schema defines configuration options for real-time system resource monitoring. It’s designed to work with the cjm-fasthtml-settings library for automatic UI generation.\n\n# Example: Accessing schema properties\nprint(f\"Schema name: {RESOURCE_MONITOR_SCHEMA['name']}\")\nprint(f\"Schema title: {RESOURCE_MONITOR_SCHEMA['title']}\")\nprint(f\"\\nDefault intervals:\")\nprint(f\"  CPU: {RESOURCE_MONITOR_SCHEMA['properties']['cpu_interval']['default']}s\")\nprint(f\"  Memory: {RESOURCE_MONITOR_SCHEMA['properties']['memory_interval']['default']}s\")\nprint(f\"  GPU: {RESOURCE_MONITOR_SCHEMA['properties']['gpu_interval']['default']}s\")\n\nSchema name: resource-monitoring\nSchema title: Resource Monitor Configuration\n\nDefault intervals:\n  CPU: 2s\n  Memory: 3s\n  GPU: 5s",
+    "crumbs": [
+      "core",
+      "Monitoring Configuration"
+    ]
+  },
+  {
+    "objectID": "core/monitoring_config.html#last-update-tracking",
+    "href": "core/monitoring_config.html#last-update-tracking",
+    "title": "Monitoring Configuration",
+    "section": "Last Update Tracking",
+    "text": "Last Update Tracking\nTrack last update times for each monitoring component. This is runtime state, not part of the configuration.",
+    "crumbs": [
+      "core",
+      "Monitoring Configuration"
+    ]
+  },
+  {
+    "objectID": "core/monitoring_config.html#sse-configuration",
+    "href": "core/monitoring_config.html#sse-configuration",
+    "title": "Monitoring Configuration",
+    "section": "SSE Configuration",
+    "text": "SSE Configuration\nConfiguration for Server-Sent Events (SSE) streaming. These settings are not exposed in the UI but can be adjusted programmatically.\n\n# Example: Using the last update times\nimport time\n\n# Simulate checking if an update is needed\ncpu_interval = RESOURCE_MONITOR_SCHEMA['properties']['cpu_interval']['default']\ncurrent_time = time.time()\n\nif current_time - LAST_UPDATE_TIMES['cpu'] &gt;= cpu_interval:\n    print(\"CPU update needed!\")\n    LAST_UPDATE_TIMES['cpu'] = current_time\nelse:\n    print(\"CPU update not yet needed\")\n\nprint(f\"\\nSSE queue size: {SSE_CONFIG['max_queue_size']}\")\n\nCPU update needed!\n\nSSE queue size: 100",
+    "crumbs": [
+      "core",
+      "Monitoring Configuration"
+    ]
+  }
+]
