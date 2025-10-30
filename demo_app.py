@@ -139,11 +139,15 @@ print("\n[5/5] Setting up FastHTML application...")
 # Import styling utilities at module level
 from cjm_fasthtml_tailwind.utilities.spacing import p, m
 from cjm_fasthtml_tailwind.utilities.sizing import container, max_w, w
-from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, text_align
+from cjm_fasthtml_tailwind.utilities.typography import font_size, font_weight, text_align, text_color, italic
+from cjm_fasthtml_tailwind.utilities.borders import rounded
+from cjm_fasthtml_tailwind.utilities.layout import overflow
 from cjm_fasthtml_tailwind.core.base import combine_classes
 from cjm_fasthtml_daisyui.components.actions.button import btn, btn_colors, btn_sizes, btn_styles
 from cjm_fasthtml_daisyui.components.data_display.badge import badge, badge_colors, badge_styles
 from cjm_fasthtml_daisyui.components.data_input.select import select, select_sizes
+from cjm_fasthtml_daisyui.components.feedback.alert import alert, alert_colors
+from cjm_fasthtml_daisyui.utilities.semantic_colors import bg_dui
 
 # Create the FastHTML app at module level
 app, rt = fast_app(
@@ -279,7 +283,7 @@ def manager():
                     hx_target="#workers-list",
                     hx_swap="outerHTML"
                 ),
-                cls=combine_classes(m.b(8), p(6), "bg-base-200", "rounded-lg")
+                cls=combine_classes(m.b(8), p(6), bg_dui.base_200, rounded.lg)
             ),
 
             # Workers list
@@ -315,7 +319,7 @@ def manager():
                     hx_swap="outerHTML"
                 ),
                 Div(id="validation-result", cls=combine_classes(m.t(4))),
-                cls=combine_classes(m.b(8), p(6), "bg-base-200", "rounded-lg")
+                cls=combine_classes(m.b(8), p(6), bg_dui.base_200, rounded.lg)
             ),
 
             # Back to home
@@ -374,7 +378,7 @@ def workers_list():
         return Div(
             H2("Active Workers", cls=combine_classes(font_size._2xl, font_weight.bold, m.b(4))),
             P("No workers registered yet. Register one above!",
-              cls=combine_classes("text-gray-500", "italic")),
+              cls=combine_classes(text_color.gray._500, italic)),
             id="workers-list"
         )
 
@@ -431,7 +435,7 @@ def workers_list():
                 Tbody(*rows),
                 cls=combine_classes(table, table_modifiers.zebra, w.full)
             ),
-            cls="overflow-x-auto"
+            cls=str(overflow.x.auto)
         ),
         id="workers-list"
     )
@@ -453,7 +457,7 @@ def validate(plugin_id: str):
         return Div(
             Div(
                 "❌ Plugin not found",
-                cls=combine_classes("alert", "alert-error")
+                cls=combine_classes(alert, alert_colors.error)
             ),
             id="validation-result"
         )
@@ -470,9 +474,9 @@ def validate(plugin_id: str):
     )
 
     # Determine alert style
-    alert_cls = "alert-success" if result.can_proceed else "alert-error"
+    alert_color = alert_colors.success if result.can_proceed else alert_colors.error
     if result.action == ValidationAction.RELOAD_PLUGIN:
-        alert_cls = "alert-warning"
+        alert_color = alert_colors.warning
 
     # Build message
     details = []
@@ -495,7 +499,7 @@ def validate(plugin_id: str):
             H3(f"Validation Result: {result.action.value.upper()}",
                cls=combine_classes(font_weight.bold, m.b(2))),
             *details,
-            cls=combine_classes("alert", alert_cls)
+            cls=combine_classes(alert, alert_color)
         ),
         id="validation-result"
     )
